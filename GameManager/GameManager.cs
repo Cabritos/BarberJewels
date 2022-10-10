@@ -3,10 +3,16 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
-#if UNITY_EDITOR
-    [SerializeField] bool onLevelDebug = false;
-    [SerializeField] int debugLevel;
-#endif
+    public bool IsConnectedToGooglePlayServices { get; private set; }
+    public ErrorUi ErrorUi { get; private set; }
+    AchivementsManager achivementManager;
+    BannerAd bannerAd;
+
+    LevelManager currentLevelManager;
+    [SerializeField] LevelConfigListSO levelConfigSO;
+    EndlessGameProgressionManager progressionManager;
+    public int CurrentLevel { get; private set; }
+    int iterationNumber;
 
     public int TotalScore { get; private set; }
     public int PreviousTotalScore { get; private set; }
@@ -14,27 +20,25 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     public int JewelHits { get; private set; }
     public bool HasLost { get; private set; }
     public bool EndlessGame { get; private set; }
-    public bool IsConnectedToGooglePlayServices { get; private set; }
-    public ErrorUi ErrorUi { get; private set; }
 
-    AchivementsManager achivementManager;
-
-    [SerializeField] LevelConfigListSO levelConfigSO;
-
-    public int CurrentLevel { get; private set; }
-
-    private EndlessGameProgressionManager progressionManager;
-    int iterationNumber;
-
-    LevelManager currentLevelManager;
+#if UNITY_EDITOR
+    [SerializeField] bool onLevelDebug = false;
+    [SerializeField] int debugLevel;
+#endif
 
     protected override void Awake()
     {
         base.Awake();
+        ErrorUi = GetComponent<ErrorUi>();
         progressionManager = GetComponent<EndlessGameProgressionManager>();
         achivementManager = GetComponent<AchivementsManager>();
-        ErrorUi = GetComponent<ErrorUi>();
+        bannerAd = GetComponent<BannerAd>();
         GooglePlayServicesManager.AuthenticateToGooglePlayServices();
+    }
+
+    private void Start()
+    {
+        bannerAd.LoadAndShowAd();
     }
 
     public void StartNewRegularGame()
@@ -42,23 +46,27 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         Debug.Log("Starting new regular game");;
         ReportNewGame();
         EndlessGame = false;
+        HasLost = false;
+        ResetScores();
         CurrentLevel = 0;
 
 #if UNITY_EDITOR
         if (onLevelDebug) CurrentLevel = debugLevel - 1;
 #endif
 
-        HasLost = false;
         LoadNextLevel();
     }
 
     public void LoadNextLevel()
     {
-        Debug.Log("Lading level");
-        TotalScore += LevelScore;
-        LevelScore = 0;
-        FindObjectOfType<BannerAd>().gameObject.SetActive(false);
+        Debug.Log("Loading level");
         CurrentLevel++;
+        LoadLevelScene();
+    }
+
+    private void LoadLevelScene()
+    {
+        HideBannerAd();
         Time.timeScale = 1;
         SceneManager.LoadScene("Level");
     }
@@ -78,21 +86,41 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     {
         Debug.Log("Starting new endless game");
         ReportNewGame();
-        achivementManager.ReportEndlessGame();
+        ResetScores();
         EndlessGame = true;
+        achivementManager.ReportEndlessGame();
         iterationNumber = 0;
 
 #if UNITY_EDITOR
         if (onLevelDebug) iterationNumber = debugLevel - 1;
 #endif
-        Time.timeScale = 1;
-        SceneManager.LoadScene("Level");
+
+        LoadLevelScene();
+    }
+
+    private void ResetScores()
+    {
+        LevelScore = 0;
+        TotalScore = 0;
+        PreviousTotalScore = 0;
+    }
+
+    private void HideBannerAd()
+    {
+        bannerAd.HideAd();
+    }
+
+    private void OnStartLevel()
+    {
+        currentLevelManager.StartingLevel -= OnStartLevel;
+        HideBannerAd();
     }
 
     public void SetupNewLevel(LevelManager levelManager)
     {
         Debug.Log("Setting up new level in game manager");
         currentLevelManager = levelManager;
+        currentLevelManager.StartingLevel += OnStartLevel;
         SoundManager.Instance.SetupNewLevel();
         achivementManager.SetupNewLevel(levelManager);
     }
@@ -114,12 +142,11 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     public void WonLevel(int score, int jewelHits)
     {
-        Debug.Log("Level won");
         EndLevel(score, jewelHits);
     }
+
     public void LostLevel(int score, int jewelHits)
     {
-        Debug.Log("Level lost");
         HasLost = true;
         achivementManager.ReportLostGame();
         EndLevel(score, jewelHits);
@@ -127,7 +154,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     private void EndLevel(int score, int jewelHits)
     {
-        Debug.Log("Ending level. Setting scores");
+        Debug.Log("Ending level");
 
         Time.timeScale = 1;
         ProcessScores(score, jewelHits);
@@ -140,24 +167,27 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
         SoundManager.Instance.EndLevel();
         SceneManager.LoadScene("Balance");
+        bannerAd.LoadAndShowAd();
     }
 
     private void ProcessScores(int score, int jewelHits)
     {
-        PreviousTotalScore = TotalScore;
         LevelScore = score;
+        PreviousTotalScore = TotalScore;
         TotalScore += score;
         JewelHits = jewelHits;
     }
 
     private void ReportAchivements()
     {
+        Debug.Log("Reporting achivements.");
         achivementManager.ReportLevelProgress();
         if (!EndlessGame) achivementManager.LevelWon(CurrentLevel);
     }
 
     private void ReportScore()
     {
+        Debug.Log("Reporting scores.");
         if (EndlessGame)
         {
             GooglePlayServicesManager.ReportEndlessGameScore(TotalScore);
@@ -201,12 +231,13 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     public void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
+        bannerAd.LoadAndShowAd();
     }
 
     public LevelConfigSO GetNewIterationConfig()
     {
-            iterationNumber++;
-            Debug.Log("New iteration: " + iterationNumber);
+        iterationNumber++;
+        Debug.Log("New iteration: " + iterationNumber);
         return progressionManager.GetNewConfig(iterationNumber);
     }
 

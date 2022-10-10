@@ -1,24 +1,31 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Advertisements;
+using UnityEngine.SceneManagement;
 
 public class BannerAd : MonoBehaviour
 {
     [SerializeField] string adUnitId = "Banner_Android";
     bool isShowing = false;
 
-    void Start()
+    public void LoadAndShowAd()
     {
         if (Application.internetReachability == NetworkReachability.NotReachable) return;
 
         if (Advertisement.isInitialized)
         {
-            if (Advertisement.Banner.isLoaded) return;
-            LoadBanner();
+            if (Advertisement.Banner.isLoaded)
+            {
+                ShowBanner();
+            }
+            else
+            {
+                LoadBanner();
+            }
         }
     }
 
-    public void LoadBanner()
+    private void LoadBanner()
     {
         BannerLoadOptions options = new BannerLoadOptions
         {
@@ -29,19 +36,21 @@ public class BannerAd : MonoBehaviour
         Advertisement.Banner.Load(adUnitId, options);
     }
 
-    void OnBannerLoaded()
+    private void OnBannerLoaded()
     {
         Debug.Log("Banner loaded");
-        ShowBannerAd();
+        ShowBanner();
     }
 
-    void OnBannerError(string message)
+    private void OnBannerError(string message)
     {
         Debug.LogError($"Banner Error: {message}");
     }
 
-    public void ShowBannerAd()
+    public void ShowBanner()
     {
+        if (SceneManager.GetActiveScene().name == "Level") return;
+
         BannerOptions options = new BannerOptions
         {
             clickCallback = OnBannerClicked,
@@ -54,9 +63,12 @@ public class BannerAd : MonoBehaviour
         Debug.Log("Banner shown");
     }
 
-    void OnBannerClicked() { }
+    private void OnBannerClicked()
+    {
+        HideAd();
+    }
 
-    void OnBannerShown()
+    private void OnBannerShown()
     {
         isShowing = true;
     }
@@ -73,7 +85,7 @@ public class BannerAd : MonoBehaviour
 
     private void OnDisable()
     {
-        Advertisement.Banner.Hide(true);
+        StopAllCoroutines();
         Destroy(gameObject);
     }
 }

@@ -5,23 +5,28 @@ using UnityEngine;
 
 public class Pause : MonoBehaviour
 {
-    public event Action<bool> OnPauseGame;
+    public event Action<bool> GamePaused;
 
     [SerializeField] GameObject pauseMenu;
-    Animator pauseMenuAnimator;
 
     bool gameHasStarted = false;
     bool isPaused = true;
 
-
-    private void Awake()
+    private void OnEnable()
     {
-        pauseMenuAnimator = pauseMenu.GetComponent<Animator>();
+        GetComponent<LevelManager>().StartingLevel += StartLevel;
+    }
+
+    private void StartLevel()
+    {
+        GetComponent<LevelManager>().StartingLevel -= StartLevel;
+        gameHasStarted = true;
+        UnpauseGame();
     }
 
     private void OnApplicationPause(bool pause)
     {
-        if (pause)
+        if (pause && gameHasStarted)
         {
             PauseGame();
         }
@@ -45,7 +50,7 @@ public class Pause : MonoBehaviour
         Time.timeScale = 0;
         isPaused = true;
         ShowMenu();
-        OnPauseGame?.Invoke(isPaused);
+        GamePaused?.Invoke(isPaused);
     }
 
     private void ShowMenu()
@@ -67,7 +72,7 @@ public class Pause : MonoBehaviour
         pauseMenu.SetActive(false);
         Time.timeScale = 1;
         isPaused = false;
-        OnPauseGame?.Invoke(isPaused);
+        GamePaused?.Invoke(isPaused);
     }
 
     public bool IsPaused()
@@ -77,12 +82,6 @@ public class Pause : MonoBehaviour
 
     private void OnDestroy()
     {
-        OnPauseGame = null;
-    }
-
-    public void StartGame()
-    {
-        gameHasStarted = true;
-        UnpauseGame();
+        GamePaused = null;
     }
 }

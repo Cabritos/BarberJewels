@@ -56,7 +56,7 @@ public class Bird : MonoBehaviour, IRecyclable, IHitable
     private void SubscribeToPause()
     {
         if (isOnMenu) return;
-        pause.OnPauseGame += HandlePause;
+        pause.GamePaused += HandlePause;
         isPaused = pause.IsPaused();
     }
 
@@ -154,6 +154,6 @@ public class Bird : MonoBehaviour, IRecyclable, IHitable
     public void OnDisable()
     {
         if (isOnMenu) return;
-        pause.OnPauseGame -= HandlePause;
+        pause.GamePaused -= HandlePause;
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class BirdSpawner : MonoBehaviour
 {
-    public event Action<ColorType> OnBirdHit;
+    public event Action<ColorType> BirdHit;
     ObjectsPool objectsPool;
 
     LevelManager levelManager;
@@ -61,7 +61,7 @@ public class BirdSpawner : MonoBehaviour
         Pause pause;
         TryGetComponent(out pause);
         if (pause == null) return;
-        pause.OnPauseGame += HandlePause;
+        pause.GamePaused += HandlePause;
     }
 
     private void CacheReferences()
@@ -282,7 +282,7 @@ public class BirdSpawner : MonoBehaviour
 
     public void NotifyBirdHit(ColorType type)
     {
-        OnBirdHit?.Invoke(type);
+        BirdHit?.Invoke(type);
     }
 
     private void OnDisable()
@@ -295,11 +295,11 @@ public class BirdSpawner : MonoBehaviour
         Pause pause;
         TryGetComponent(out pause);
         if (pause == null) return;
-        pause.OnPauseGame -= HandlePause;
+        pause.GamePaused -= HandlePause;
     }
 
     private void OnDestroy()
     {
-        OnBirdHit = null;
+        BirdHit = null;
     }
 }

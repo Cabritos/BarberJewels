@@ -4,8 +4,8 @@ using System.Collections;
 
 public class Score : MonoBehaviour
 {
-    public event Action<int> OnScoreUpdated;
-    public event Action OnYellowBirdPowerEarned;
+    public event Action<int> ScoreUpdated;
+    public event Action YellowBirdPowerEarned;
 
     public int CurrentScore { get; private set; }
     ColorType lastDestroyed = ColorType.nullColor;
@@ -72,7 +72,7 @@ public class Score : MonoBehaviour
     private void AddToTotalScore(int ammount)
     {
         CurrentScore += ammount;
-        OnScoreUpdated?.Invoke(CurrentScore);
+        ScoreUpdated?.Invoke(CurrentScore);
     }
 
     public void DebugAddScore()
@@ -98,7 +98,7 @@ public class Score : MonoBehaviour
     {
         yellowPower.SetActive(true);
         yellowPower.GetComponent<YellowBirdPower>().PowerWon();
-        OnYellowBirdPowerEarned?.Invoke();
+        YellowBirdPowerEarned?.Invoke();
     }
 
     public void SetScoreMultiplier(int multiplier, float time)
@@ -127,6 +127,6 @@ public class Score : MonoBehaviour
 
     private void OnDestroy()
     {
-        OnScoreUpdated = null;
+        ScoreUpdated = null;
     }
 }

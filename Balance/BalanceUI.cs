@@ -42,8 +42,8 @@ public class BalanceUI : MonoBehaviour
 
     private IEnumerator RegularModeBalance()
     {
-        var totalScore = GameManager.Instance.PreviousTotalScore;
-        totalScoreText.text = totalScore.ToString();
+        var previousTotalScore = GameManager.Instance.PreviousTotalScore;
+        totalScoreText.text = previousTotalScore.ToString();
 
         yield return new WaitForSeconds(2f);
 
@@ -52,7 +52,7 @@ public class BalanceUI : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        StartCoroutine(AddScoreAnimation(levelEarnings, totalScore, 10, totalScoreText));
+        StartCoroutine(AddScoreAnimation(levelEarnings, previousTotalScore, 10, totalScoreText));
     }
 
     private IEnumerator EndlessModeBalance()
@@ -62,8 +62,8 @@ public class BalanceUI : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        var levelEarnings = GameManager.Instance.JewelHits;
-        StartCoroutine(AddScoreAnimation(levelEarnings, 0, 10, levelScoreText));
+        var jewelsDestroyed = GameManager.Instance.JewelHits;
+        StartCoroutine(AddScoreAnimation(jewelsDestroyed, 0, 10, levelScoreText));
 
         yield return new WaitForSeconds(1f);
 
@@ -93,7 +93,7 @@ public class BalanceUI : MonoBehaviour
     {
         StopAllCoroutines();
 
-        var totalScore = GameManager.Instance.LevelScore + GameManager.Instance.PreviousTotalScore;
+        var totalScore = GameManager.Instance.TotalScore;
         totalScoreText.text = totalScore.ToString();
 
         if (endlessGame)

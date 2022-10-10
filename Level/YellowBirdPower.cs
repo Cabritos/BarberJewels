@@ -5,6 +5,7 @@ using UnityEngine;
 public class YellowBirdPower : MonoBehaviour
 {
     [SerializeField] LevelManager levelManager;
+    JewelManager jewelManager;
     FxSpawner fxSpawner;
 
     TMP_Text text;
@@ -18,6 +19,7 @@ public class YellowBirdPower : MonoBehaviour
     private void Awake()
     {
         fxSpawner = levelManager.FxSpawner;
+        jewelManager = levelManager.JewelManager;
         text = GetComponentInChildren<TMP_Text>();
         gameObject.SetActive(false);
     }
@@ -30,6 +32,8 @@ public class YellowBirdPower : MonoBehaviour
     
     public void ReleaseYellowBirdPower()
     {
+        if (jewelManager.NoJewelsAreInGameArea()) return;
+
         SpawnPower();
         RemoveOne();
     }

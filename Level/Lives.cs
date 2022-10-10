@@ -8,12 +8,12 @@ public class Lives : MonoBehaviour
 #endif
 
     int remainigLives = 5;
-    public event Action<int> OnLivesUpdated;
+    public event Action<int> LivesUpdated;
     public event Action<int> OnLivesWon;
 
     private void Start()
     {
-        OnLivesUpdated?.Invoke(remainigLives);
+        LivesUpdated?.Invoke(remainigLives);
     }
 
     public void SetAmmount(int ammount)
@@ -33,7 +33,7 @@ public class Lives : MonoBehaviour
     {
         remainigLives += ammount;
         OnLivesWon?.Invoke(ammount);
-        OnLivesUpdated?.Invoke(remainigLives);
+        LivesUpdated?.Invoke(remainigLives);
         return remainigLives;
     }
 
@@ -44,13 +44,13 @@ public class Lives : MonoBehaviour
 #endif
 
         remainigLives -= ammount;
-        OnLivesUpdated?.Invoke(remainigLives);
+        LivesUpdated?.Invoke(remainigLives);
         return remainigLives;
     }
 
     private void OnDestroy()
     {
-        OnLivesUpdated = null;
+        LivesUpdated = null;
         OnLivesWon = null;
     }
 }

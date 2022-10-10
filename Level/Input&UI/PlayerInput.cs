@@ -4,8 +4,8 @@ using System;
 
 public class PlayerInput : MonoBehaviour
 {
-    public event Action<ColorType> OnChangeSelection;
-    public event Action<ColorType> OnPowerButtonPress;
+    public event Action<ColorType> ChangedSelection;
+    public event Action<ColorType> PowerButtonPressed;
 
     [SerializeField] LayerMask raycastLayerMask;
     Camera mainCamera;
@@ -45,7 +45,7 @@ public class PlayerInput : MonoBehaviour
     private void SubscribeToPauseEvent()
     {
         var pause = GetComponent<Pause>();
-        pause.OnPauseGame += PausedGame;
+        pause.GamePaused += PausedGame;
     }
 
     private void OnDisable()
@@ -56,7 +56,7 @@ public class PlayerInput : MonoBehaviour
     private void UnsubscribeToPauseEvent()
     {
         var pause = GetComponent<Pause>();
-        pause.OnPauseGame -= PausedGame;
+        pause.GamePaused -= PausedGame;
     }
 
     private void PausedGame(bool paused)
@@ -119,7 +119,7 @@ public class PlayerInput : MonoBehaviour
         if (type == selectedColorType) return;
 
         selectedColorType = type;
-        OnChangeSelection(selectedColorType);
+        ChangedSelection(selectedColorType);
         SoundManager.Instance.PlayClip(changeSelectionClip);
     }
 
@@ -165,11 +165,11 @@ public class PlayerInput : MonoBehaviour
 
     public void PowerButtonPress()
     {
-        OnPowerButtonPress?.Invoke(selectedColorType);
+        PowerButtonPressed?.Invoke(selectedColorType);
     }
 
     private void OnDestroy()
     {
-        OnChangeSelection = null;
+        ChangedSelection = null;
     }
 }

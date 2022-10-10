@@ -54,38 +54,38 @@ public class LevelUI : MonoBehaviour
     private void SubscribeToPauseEvent()
     {
         var pause = level.GetComponent<Pause>();
-        pause.OnPauseGame += ActivatePauseCanvas;
+        pause.GamePaused += ActivatePauseCanvas;
     }
 
     private void SubscribeToInputEvents()
     {
         var playerInput = level.GetComponent<PlayerInput>();
-        playerInput.OnChangeSelection += UpdateSelection;
-        playerInput.OnPowerButtonPress += DeactivatePowerButton;
+        playerInput.ChangedSelection += UpdateSelection;
+        playerInput.PowerButtonPressed += DeactivatePowerButton;
     }
 
     private void SubscribeToScoreEvent()
     {
         var score = level.GetComponent<Score>();
-        score.OnScoreUpdated += UpdateScoreText;
+        score.ScoreUpdated += UpdateScoreText;
     }
 
     private void SubscribeToLivesEvent()
     {
         var lives = level.GetComponent<Lives>();
-        lives.OnLivesUpdated += UpdateLivesText;
+        lives.LivesUpdated += UpdateLivesText;
     }
 
     private void SubscribeToRemainingJewels()
     {
         var levelManager = level.GetComponent<JewelManager>();
-        levelManager.OnUpdateRemainingJewels += UpdateJewelsText;
+        levelManager.RemainingJewelsUpdated += UpdateJewelsText;
     }
 
     private void SubscribeToBirdsDestroyed()
     {
         var birdSpawner = level.GetComponent<BirdSpawner>();
-        birdSpawner.OnBirdHit += OnBirdHit;
+        birdSpawner.BirdHit += OnBirdHit;
     }
 
     private void OnDisable()
@@ -108,37 +108,37 @@ public class LevelUI : MonoBehaviour
     private void UnsubscribeToPauseAndUnpauseEvents()
     {
         var pause = level.GetComponent<Pause>();
-        pause.OnPauseGame -= ActivatePauseCanvas;
+        pause.GamePaused -= ActivatePauseCanvas;
     }
     private void UnubscribeToInputEvents()
     {
         var playerInput = level.GetComponent<PlayerInput>();
-        playerInput.OnChangeSelection -= UpdateSelection;
-        playerInput.OnPowerButtonPress -= DeactivatePowerButton;
+        playerInput.ChangedSelection -= UpdateSelection;
+        playerInput.PowerButtonPressed -= DeactivatePowerButton;
     }
 
     private void UnsubcribeToScoreEvent()
     {
         var score = level.GetComponent<Score>();
-        score.OnScoreUpdated -= UpdateScoreText;
+        score.ScoreUpdated -= UpdateScoreText;
     }
 
     private void UnsubscribeToLivesEvent()
     {
         var lives = level.GetComponent<Lives>();
-        lives.OnLivesUpdated -= UpdateLivesText;
+        lives.LivesUpdated -= UpdateLivesText;
     }
 
     private void UnsubscribeToRemainingJewels()
     {
         var levelManager = level.GetComponent<JewelManager>();
-        levelManager.OnUpdateRemainingJewels -= UpdateJewelsText;
+        levelManager.RemainingJewelsUpdated -= UpdateJewelsText;
     }
 
     private void UnubscribeToBirdsDestroyed()
     {
         var birdSpawner = level.GetComponent<BirdSpawner>();
-        birdSpawner.OnBirdHit -= OnBirdHit;
+        birdSpawner.BirdHit -= OnBirdHit;
     }
 
     private void Start()
@@ -169,7 +169,7 @@ public class LevelUI : MonoBehaviour
         yield return new WaitForSeconds(greatingsDuration * 0.25f);
 
         greatingText.gameObject.SetActive(false);
-        levelManager.Pause.StartGame();
+        levelManager.StartLevel();
 
         yield return new WaitForSeconds(1);
 
@@ -306,8 +306,8 @@ public class LevelUI : MonoBehaviour
         jewelsLabel.text = "Jewels:";
 
         var jewelManager = level.GetComponent<JewelManager>();
-        jewelManager.OnUpdateRemainingJewels -= UpdateJewelsText;
-        jewelManager.OnJewelHit += OnJewelDestroyed;
+        jewelManager.RemainingJewelsUpdated -= UpdateJewelsText;
+        jewelManager.JewelHit += OnJewelDestroyed;
     }
 
     private void OnJewelDestroyed(ColorType type, int mult)

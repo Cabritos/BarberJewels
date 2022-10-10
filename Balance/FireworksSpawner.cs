@@ -3,9 +3,7 @@ using System.Collections;
 using UnityEngine;
 
 public class FireworksSpawner : MonoBehaviour
-{
-    public event Action OnFireworks;
-
+{ 
     [SerializeField] GameObject prefab;
 
     [SerializeField] float minRandomSpawnTime;
@@ -50,8 +48,6 @@ public class FireworksSpawner : MonoBehaviour
 
         SetRandomScale(fireworksGameObject);
         InjectObjectsPool(fireworksGameObject);
-
-        OnFireworks?.Invoke();
     }
 
     private void SetRandomPositionAndRotation(out Vector3 position, out Quaternion rotation)
@@ -77,8 +73,8 @@ public class FireworksSpawner : MonoBehaviour
         return new Vector3 (0, 0, UnityEngine.Random.Range(-maxRandomRotation, maxRandomRotation));
     }
 
-    private void OnDestroy()
+    private void OnDisable()
     {
-        OnFireworks = null;
+        StopAllCoroutines();
     }
 }

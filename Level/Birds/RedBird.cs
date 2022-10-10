@@ -30,7 +30,7 @@ public class RedBird : Bird
     private void DisplayFx(int multiplier)
     {
         var fxText = "Bonus x" + multiplier + "!";
-        var fx = fxSpawner.DisplayPersistentTextOnParent(fxText, true, rewardTime, transform.position, birdSpawner.birdsParent);
+        var fx = fxSpawner.DisplayPersistentText(fxText, true, rewardTime, transform.position, birdSpawner.birdsParent);
         fx.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
     }
 }

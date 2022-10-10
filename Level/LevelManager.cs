@@ -4,9 +4,10 @@ using System;
 
 public class LevelManager : MonoBehaviour
 {
-    public event Action<float> OnResetPositions;
-    public event Action OnRewind;
-    public event Action<float> OnSlowDown;
+    public event Action<float> ResetingPositions;
+    public event Action Rewinding;
+    public event Action<float> SlowingDown;
+    public event Action StartingLevel;
 
     public Score Score { get; private set; }
     public Lives Lives { get; private set; }
@@ -22,7 +23,7 @@ public class LevelManager : MonoBehaviour
     float initialVerticalOffset;
 
     LevelConfigSO currentLevelConfig;
-    
+
     private void Awake()
     {
         CacheReferences();
@@ -74,7 +75,7 @@ public class LevelManager : MonoBehaviour
 
     private void SetupPoleAndCamera()
     {
-        mainAxisMovement.SetVerticalSpeed(currentLevelConfig.VerticalSpeed);    
+        mainAxisMovement.SetVerticalSpeed(currentLevelConfig.VerticalSpeed);
         mainAxisMovement.SetRotationSpeed(currentLevelConfig.RotationSpeed);
 
         poleMovement.SetVerticalSpeed(currentLevelConfig.VerticalSpeed);
@@ -105,7 +106,7 @@ public class LevelManager : MonoBehaviour
     {
         var resetDistance = GetResetDistance();
 
-        OnResetPositions?.Invoke(resetDistance);
+        ResetingPositions?.Invoke(resetDistance);
     }
 
     private void SetInitialVerticalOffset()
@@ -118,14 +119,20 @@ public class LevelManager : MonoBehaviour
         return -initialVerticalOffset + mainAxisMovement.transform.position.y;
     }
 
+    public void StartLevel()
+    {
+        StartingLevel?.Invoke();
+        StartingLevel = null;
+    }
+
     public void Rewind()
     {
-        OnRewind?.Invoke();
+        Rewinding?.Invoke();
     }
 
     public void SlowDown(float duration)
     {
-        OnSlowDown?.Invoke(duration);
+        SlowingDown?.Invoke(duration);
     }
 
     public int GetCurrentLevel()
@@ -137,11 +144,20 @@ public class LevelManager : MonoBehaviour
     {
         if (lost)
         {
+            Debug.Log($"Level lost with {Score.CurrentScore} points and {JewelManager.JewelHits} jewels destroyed");
             GameManager.Instance.LostLevel(Score.CurrentScore, JewelManager.JewelHits);
         }
         else
         {
+            Debug.Log($"Level won with {Score.CurrentScore} points and {JewelManager.JewelHits} jewels destroyed");
             GameManager.Instance.WonLevel(Score.CurrentScore, JewelManager.JewelHits);
         }
+    }
+
+    private void OnDisable()
+    {
+        ResetingPositions = null;
+        Rewinding = null;
+        SlowingDown = null;
     }
 }

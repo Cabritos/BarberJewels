@@ -74,13 +74,13 @@ public class AchivementsManager : MonoBehaviour
 
     private void SubscribeToLevelsEvents()
     {
-        currentLevelManager.JewelManager.OnJewelHit += CountJewelHit;
-        currentLevelManager.BirdSpawner.OnBirdHit += CountBirdHit;
-        currentLevelManager.OnRewind += CountRewinds;
-        currentLevelManager.OnSlowDown += CountSlowDonws;
-        currentLevelManager.Score.OnYellowBirdPowerEarned += CountYellowBirdPowersEarned;
+        currentLevelManager.JewelManager.JewelHit += CountJewelHit;
+        currentLevelManager.BirdSpawner.BirdHit += CountBirdHit;
+        currentLevelManager.Rewinding += CountRewinds;
+        currentLevelManager.SlowingDown += CountSlowDonws;
+        currentLevelManager.Score.YellowBirdPowerEarned += CountYellowBirdPowersEarned;
         currentLevelManager.Lives.OnLivesWon += CountLivesWon;
-        currentLevelManager.GetComponent<PlayerInput>().OnPowerButtonPress += CountOrangePowers;
+        currentLevelManager.GetComponent<PlayerInput>().PowerButtonPressed += CountOrangePowers;
     }
 
     private void CountJewelHit(ColorType type, int combo)
@@ -207,12 +207,12 @@ public class AchivementsManager : MonoBehaviour
     {
         if (currentLevelManager == null) return;
 
-        currentLevelManager.JewelManager.OnJewelHit -= CountJewelHit;
-        currentLevelManager.BirdSpawner.OnBirdHit -= CountBirdHit;
-        currentLevelManager.OnRewind -= CountRewinds;
-        currentLevelManager.OnSlowDown -= CountSlowDonws;
-        currentLevelManager.Score.OnYellowBirdPowerEarned -= CountYellowBirdPowersEarned;
+        currentLevelManager.JewelManager.JewelHit -= CountJewelHit;
+        currentLevelManager.BirdSpawner.BirdHit -= CountBirdHit;
+        currentLevelManager.Rewinding -= CountRewinds;
+        currentLevelManager.SlowingDown -= CountSlowDonws;
+        currentLevelManager.Score.YellowBirdPowerEarned -= CountYellowBirdPowersEarned;
         currentLevelManager.Lives.OnLivesWon -= CountLivesWon;
-        currentLevelManager.GetComponent<PlayerInput>().OnPowerButtonPress -= CountOrangePowers;
+        currentLevelManager.GetComponent<PlayerInput>().PowerButtonPressed -= CountOrangePowers;
     }
 }

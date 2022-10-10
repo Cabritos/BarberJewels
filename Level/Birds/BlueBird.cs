@@ -27,7 +27,7 @@ public class BlueBird : Bird
 
     private void DisplayFx(int ammount)
     {
-        var fx = fxSpawner.DisplayLivesFxOnParent(ammount, false, transform.position, birdSpawner.birdsParent);
+        var fx = fxSpawner.DisplayLivesFx(ammount, false, transform.position);
         fx.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
     }
 }

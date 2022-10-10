@@ -97,14 +97,14 @@ public class SoundManager : SingletonMonobehaviour<SoundManager>
     {
         var pause = GetComponent<Pause>();
         if (pause == null) return;
-        pause.OnPauseGame += PausedGame;
+        pause.GamePaused += PausedGame;
     }
 
     private void SubscribeToJewelManagerEvent()
     {
         var levelManager = GameManager.Instance.GetCurrentLevelManager();
         if (levelManager == null) return;
-        levelManager.JewelManager.OnJewelHit += PlayJewelDestroyedClip;
+        levelManager.JewelManager.JewelHit += PlayJewelDestroyedClip;
     }
 
     public void EndLevel()
@@ -117,14 +117,14 @@ public class SoundManager : SingletonMonobehaviour<SoundManager>
     {
         var pause = GetComponent<Pause>();
         if (pause == null) return;
-        pause.OnPauseGame -= PausedGame;
+        pause.GamePaused -= PausedGame;
     }
 
     private void UnubscribeToJewelManagerEvent()
     {
         var levelManager = GameManager.Instance.GetCurrentLevelManager();
         if (levelManager == null) return;
-        levelManager.JewelManager.OnJewelHit -= PlayJewelDestroyedClip;
+        levelManager.JewelManager.JewelHit -= PlayJewelDestroyedClip;
     }
 
     public void SetSfxVolume(float volume)

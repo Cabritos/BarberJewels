@@ -29,10 +29,10 @@ public class MainMovement : MonoBehaviour
 
     private void SubscribeToEvents()
     {
-        levelManager.Pause.OnPauseGame += PausedGame;
-        levelManager.OnResetPositions += ResetPosition;
-        levelManager.OnRewind += Rewind;
-        levelManager.OnSlowDown += SlowDown;
+        levelManager.Pause.GamePaused += PausedGame;
+        levelManager.ResetingPositions += ResetPosition;
+        levelManager.Rewinding += Rewind;
+        levelManager.SlowingDown += SlowDown;
     }
 
     private void OnDisable()
@@ -44,10 +44,10 @@ public class MainMovement : MonoBehaviour
     {
         if (levelManager == null) return;
 
-        levelManager.Pause.OnPauseGame -= PausedGame;
-        levelManager.OnResetPositions -= ResetPosition;
-        levelManager.OnRewind -= Rewind;
-        levelManager.OnSlowDown -= SlowDown;
+        levelManager.Pause.GamePaused -= PausedGame;
+        levelManager.ResetingPositions -= ResetPosition;
+        levelManager.Rewinding -= Rewind;
+        levelManager.SlowingDown -= SlowDown;
     }
 
     private void PausedGame(bool isPaused)

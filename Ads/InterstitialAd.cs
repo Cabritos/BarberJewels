@@ -95,7 +95,7 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
 
     public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
     {
-        banner.ShowBannerAd();
+        banner.ShowBanner();
         InhabilitateButton();
         LoadAd();
     }

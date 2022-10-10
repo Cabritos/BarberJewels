@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class JewelManager : MonoBehaviour
 {
-    public event Action<ColorType, int> OnJewelHit;
-    public event Action<int> OnUpdateRemainingJewels;
+    public event Action<ColorType, int> JewelHit;
+    public event Action<int> RemainingJewelsUpdated;
 
     LevelManager levelManager;
     Score score;
@@ -54,7 +54,7 @@ public class JewelManager : MonoBehaviour
     {
         ObjectsPool.GenerateJewelsPools(PlayableJewels);
 
-        OnUpdateRemainingJewels?.Invoke(remaningJewels);
+        RemainingJewelsUpdated?.Invoke(remaningJewels);
 
         EnqueJewelPositions();
         IfNeededCreateJewelsInGameArea();
@@ -66,7 +66,7 @@ public class JewelManager : MonoBehaviour
         isEndlessMode = levelConfig.EndlessMode;
 
         remaningJewels = levelConfig.JewelsAmmount;
-        OnUpdateRemainingJewels?.Invoke(remaningJewels);
+        RemainingJewelsUpdated?.Invoke(remaningJewels);
 
         ringHeight = levelConfig.RingHeight;
         jewelsPerRing = levelConfig.JewelsPerRing;
@@ -81,12 +81,12 @@ public class JewelManager : MonoBehaviour
     private void SubscribeToEvents()
     {
         var pause = GetComponent<Pause>();
-        pause.OnPauseGame += PausedGame;
+        pause.GamePaused += OnPausedGame;
 
         var playerInput = GetComponent<PlayerInput>();
-        playerInput.OnPowerButtonPress += HitAllJewelsOfColor;
+        playerInput.PowerButtonPressed += HitAllJewelsOfColor;
 
-        levelManager.OnResetPositions += ResetToInitialPosition;
+        levelManager.ResetingPositions += ResetToInitialPosition;
     }
 
     private void OnDisable()
@@ -97,15 +97,15 @@ public class JewelManager : MonoBehaviour
     private void UnsubscribeToEvents()
     {
         var pause = GetComponent<Pause>();
-        pause.OnPauseGame -= PausedGame;
+        pause.GamePaused -= OnPausedGame;
 
         var playerInput = GetComponent<PlayerInput>();
-        playerInput.OnPowerButtonPress -= HitAllJewelsOfColor;
+        playerInput.PowerButtonPressed -= HitAllJewelsOfColor;
 
-        levelManager.OnResetPositions -= ResetToInitialPosition;
+        levelManager.ResetingPositions -= ResetToInitialPosition;
     }
 
-    private void PausedGame(bool isPaused)
+    private void OnPausedGame(bool isPaused)
     {
         gameIsPaused = isPaused;
     }
@@ -234,7 +234,7 @@ public class JewelManager : MonoBehaviour
     private ColorType GetRandomJewelType()
     {
         var jewelTemplates = jewelTemplatesList.GetJewelTemplates();
-        var templateType = jewelTemplates[UnityEngine.Random.Range(1, PlayableJewels)];
+        var templateType = jewelTemplates[UnityEngine.Random.Range(1, PlayableJewels + 1)];
 
         return templateType.jewelType;
     }
@@ -259,7 +259,7 @@ public class JewelManager : MonoBehaviour
 
         remainingJewelPositionsQueue.Dequeue();
         remaningJewels--;
-        OnUpdateRemainingJewels?.Invoke(remaningJewels);
+        RemainingJewelsUpdated?.Invoke(remaningJewels);
 
         if (remaningJewels > 0)
         {
@@ -273,7 +273,7 @@ public class JewelManager : MonoBehaviour
         var position = jewel.gameObject.transform.position;
 
         RemoveJewel(jewel.gameObject);
-        OnJewelHit?.Invoke(jewel.Type, finalScore.ComboMultiplier);
+        JewelHit?.Invoke(jewel.Type, finalScore.ComboMultiplier);
         JewelHits++;
 
         InstantiatePointsFx(finalScore.Score, finalScore.ComboMultiplier, position);
@@ -321,9 +321,12 @@ public class JewelManager : MonoBehaviour
 
     private void RemoveJewel(GameObject jewelGameObject)
     {
+        var wasBottom = (jewelGameObject.transform == bottomJewel);
+
         currentJewels.Remove(jewelGameObject.transform);
         jewelGameObject.GetComponent<Jewel>().Recycle();
-        UpdateBottomJewel();
+
+        if (wasBottom) UpdateBottomJewel();
     }
 
     public void HitAllJewels(int ammount)
@@ -387,7 +390,7 @@ public class JewelManager : MonoBehaviour
     {
         if (currentJewels.Count == 0) yield return null;
 
-        IEnumerable<Transform> currentJewelsTransforms = currentJewels.OrderBy(jewel => jewel.transform.position.y);
+        IEnumerable<Transform> currentJewelsTransforms = currentJewels;
 
         foreach (var jewelTransform in currentJewelsTransforms)
         {
@@ -428,7 +431,7 @@ public class JewelManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        OnJewelHit = null;
-        OnUpdateRemainingJewels = null;
+        JewelHit = null;
+        RemainingJewelsUpdated = null;
     }
 }
