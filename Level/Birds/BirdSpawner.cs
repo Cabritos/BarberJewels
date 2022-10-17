@@ -10,6 +10,7 @@ public class BirdSpawner : MonoBehaviour
     ObjectsPool objectsPool;
 
     LevelManager levelManager;
+    Lives lives;
 
     [SerializeField] GameObject prefab;
     [SerializeField] public Transform birdsParent;
@@ -31,7 +32,7 @@ public class BirdSpawner : MonoBehaviour
     float currentRandomWait;
 
     bool isPaused = true;
-    bool isSpawnig = true;
+    bool isSpawning = true;
     bool isOnMenu = false;
 
     private void Awake()
@@ -51,17 +52,18 @@ public class BirdSpawner : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    private void GenerateBirsColorsDictionary()
     {
-        SubscribeToPauseEvent();
-    }
+        birdsColorsDictionary.Clear();
 
-    private void SubscribeToPauseEvent()
-    {
-        Pause pause;
-        TryGetComponent(out pause);
-        if (pause == null) return;
-        pause.GamePaused += HandlePause;
+        var jewelTemplates = jewelTemplatesListSO.GetJewelTemplates();
+
+        for (int i = 1; i < playableBirds; i++)
+        {
+            birdsColorsDictionary.Add(jewelTemplates[i].jewelType, jewelTemplates[i].color);
+        }
+
+        birdsColorsDictionary.Add(ColorType.black, jewelTemplates[0].color);
     }
 
     private void CacheReferences()
@@ -75,7 +77,20 @@ public class BirdSpawner : MonoBehaviour
         else
         {
             levelManager = GetComponent<LevelManager>();
+            lives = levelManager.Lives;
         }
+    }
+
+    private void OnEnable()
+    {
+        SubscribeToPauseEvent();
+    }
+
+    private void SubscribeToPauseEvent()
+    {
+        var pause = GetComponent<Pause>();
+        if (pause == null) return;
+        pause.GamePaused += HandlePause;
     }
 
     private void HandlePause(bool isPaused)
@@ -83,11 +98,28 @@ public class BirdSpawner : MonoBehaviour
         this.isPaused = isPaused;
     }
 
+    public void SetupBirdSpawner(int playableBirds, float minRandomSpawnTime, float maxRandomSpawnTime)
+    {
+        if (playableBirds == 0)
+        {
+            isSpawning = false;
+        }
+        else
+        {
+            this.playableBirds = playableBirds;
+            this.minRandomSpawnTime = minRandomSpawnTime;
+            this.maxRandomSpawnTime = minRandomSpawnTime;
+
+            GenerateBirsColorsDictionary();
+            isSpawning = true;
+        }
+    }
+
     private IEnumerator Start()
     {
         NewCurrentRandomWait();
 
-        while (isSpawnig || isOnMenu)
+        while (isSpawning || isOnMenu)
         {
             yield return new WaitForSeconds(currentRandomWait);
 
@@ -102,36 +134,6 @@ public class BirdSpawner : MonoBehaviour
         currentRandomWait = UnityEngine.Random.Range(minRandomSpawnTime, maxRandomSpawnTime);
     }
 
-    public void SetupBirdSpawner(int playableBirds, float minRandomSpawnTime, float maxRandomSpawnTime)
-    {
-        if (playableBirds == 0)
-        {
-            isSpawnig = false;
-        }
-        else
-        {
-            this.playableBirds = playableBirds;
-            this.minRandomSpawnTime = minRandomSpawnTime;
-            this.maxRandomSpawnTime = minRandomSpawnTime;
-
-            GenerateBirsColorsDictionary();
-            isSpawnig = true;
-        }
-    }
-
-    private void GenerateBirsColorsDictionary()
-    {
-        birdsColorsDictionary.Clear();
-
-        var jewelTemplates = jewelTemplatesListSO.GetJewelTemplates();
-
-        for (int i = 1; i < playableBirds; i++)
-        {
-            birdsColorsDictionary.Add(jewelTemplates[i].jewelType, jewelTemplates[i].color);
-        }
-
-        birdsColorsDictionary.Add(ColorType.black, jewelTemplates[0].color);
-    }
 
     public GameObject SpawnBird(bool sound)
     {
@@ -158,6 +160,7 @@ public class BirdSpawner : MonoBehaviour
         }
 
         StartCoroutine(RelaseBirdsRoutine(birds));
+        currentRandomWait += 7;
     }
 
     private IEnumerator RelaseBirdsRoutine(Transform[] birds)
@@ -165,7 +168,6 @@ public class BirdSpawner : MonoBehaviour
         foreach (var bird in birds)
         {
             bird.GetComponent<Bird>().StartMovement();
-            PlaySpawnSound();
             yield return new WaitForSeconds(UnityEngine.Random.Range(0.5f, 3f));
         }
     }
@@ -175,7 +177,7 @@ public class BirdSpawner : MonoBehaviour
         var fliesToRight = GetRandomDirection();
         var position = GetStartingPosition(fliesToRight);
         var birdGameObject = GetBirdFromPool(position);
-        var birdComponent = SetBirdComponentFromRandomType(birdGameObject);
+        var birdComponent = ApplyRandomTypeBirdComponent(birdGameObject);
 
         birdComponent.ReleaseNewBird(levelManager, objectsPool, speed, fliesToRight, isOnMenu);
 
@@ -211,7 +213,7 @@ public class BirdSpawner : MonoBehaviour
         return bird;
     }
 
-    private Bird SetBirdComponentFromRandomType(GameObject bird)
+    private Bird ApplyRandomTypeBirdComponent(GameObject bird)
     {
         var type = GetRandomBirdType();
         Bird birdComponent = AddBirdComponent(bird, type);
@@ -222,9 +224,17 @@ public class BirdSpawner : MonoBehaviour
 
     private ColorType GetRandomBirdType()
     {
-        var index = UnityEngine.Random.Range(0, playableBirds);
-        if (index == 0) return ColorType.black;
+        var maxValue = playableBirds;
 
+        if (!isOnMenu && lives.GetLives() == 1)
+        {
+            maxValue =  playableBirds + 1;
+        }
+
+        var index = UnityEngine.Random.Range(0, maxValue);
+
+        if (index == 0) return ColorType.black;
+        if (index == playableBirds + 1) return ColorType.blue;
         return (ColorType)index;
     }
 
@@ -288,6 +298,7 @@ public class BirdSpawner : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeToPauseEvent();
+        StopAllCoroutines();
     }
 
     private void UnsubscribeToPauseEvent()

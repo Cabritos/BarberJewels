@@ -71,6 +71,11 @@ public class BannerAd : MonoBehaviour
     private void OnBannerShown()
     {
         isShowing = true;
+
+        if (SceneManager.GetActiveScene().name == "Level")
+        {
+            HideAd();
+        }
     }
         
     public void HideAd()

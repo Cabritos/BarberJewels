@@ -97,7 +97,7 @@ public class Score : MonoBehaviour
     private void GetYellowPower()
     {
         yellowPower.SetActive(true);
-        yellowPower.GetComponent<YellowBirdPower>().PowerWon();
+        yellowPower.GetComponent<YellowPowerButtton>().PowerWon();
         YellowBirdPowerEarned?.Invoke();
     }
 
@@ -115,14 +115,19 @@ public class Score : MonoBehaviour
 
     public struct ScoreResult
     {
+        public int Score { get; }
+        public int ComboMultiplier { get; }
+
         public ScoreResult(int score, int comboMultiplier)
         {
             Score = score;
             ComboMultiplier = comboMultiplier;
         }
+    }
 
-        public int Score { get; }
-        public int ComboMultiplier { get; }
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 
     private void OnDestroy()

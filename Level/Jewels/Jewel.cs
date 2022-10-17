@@ -1,4 +1,3 @@
-using System.Linq;
 using UnityEngine;
 
 public class Jewel : MonoBehaviour, IHitable, IRecyclable

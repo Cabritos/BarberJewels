@@ -12,23 +12,11 @@ public class FxSpawner : MonoBehaviour
     [SerializeField] GameObject trailPrefab;
     LevelManager levelManger;
     ObjectsPool objectsPool;
-    JewelManager jewelManager;
 
     private void Awake()
     {
         levelManger = GetComponent<LevelManager>();
         objectsPool = levelManger.ObjectsPool;
-        jewelManager = levelManger.JewelManager;
-    }
-
-    private void OnEnable()
-    {
-        var playerInput = GetComponent<PlayerInput>();
-    }
-
-    private void OnDisable()
-    {
-        var playerInput = GetComponent<PlayerInput>();
     }
 
     public void ReleaseTrail()

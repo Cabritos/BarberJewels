@@ -9,8 +9,8 @@ public class LevelConfigListSO : ScriptableObject
     public LevelConfigSO GetLevelConfig(int levelId)
     {
         if (levelId > configArray.Length)
-        {
-            Debug.LogError("Level requested Id was higher than levels listed."); //TODO progression
+        {   
+            Debug.LogError("Level requested Id was higher than levels listed.");
             return (configArray[configArray.Length]);
         }
 

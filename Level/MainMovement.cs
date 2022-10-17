@@ -12,9 +12,10 @@ public class MainMovement : MonoBehaviour
     [SerializeField] float rotationSpeed;
     [SerializeField] float rewindSpeed;
     [SerializeField] bool isPole;
+
     bool gameIsPaused = true;
-    bool isRewinding = false;
-    bool isSlowedDown = false;
+
+    float rewindRamainingTime = 0f;
     float slowedEffectRamainingTime = 0f;
 
     private void Awake()
@@ -65,14 +66,13 @@ public class MainMovement : MonoBehaviour
         this.rotationSpeed = rotationSpeed;
     }
 
-    private void Rewind()
+    private void Rewind(float duration)
     {
-        isRewinding = true;
+        rewindRamainingTime = duration;
     }
 
     private void SlowDown(float duration)
     {
-        isSlowedDown = true;
         slowedEffectRamainingTime += duration;
     }
 
@@ -88,11 +88,11 @@ public class MainMovement : MonoBehaviour
             return;
         }
 
-        if (isRewinding)
+        if (rewindRamainingTime > 0)
         {
             RewindMovement();
         }
-        else if (isSlowedDown)
+        else if (slowedEffectRamainingTime > 0)
         {
             SlowDownMovement();
         }
@@ -140,30 +140,21 @@ public class MainMovement : MonoBehaviour
     {
         if (jewelManager.NoJewelsAreInGameArea())
         {
-            isRewinding = false;
+            rewindRamainingTime = 0;
         }
         else
         {
             MoveDown();
             InverseRotation(rotationSpeed);
+            rewindRamainingTime -= Time.deltaTime;
         }
     }
 
     private void SlowDownMovement()
     {
-        if (slowedEffectRamainingTime <= 0)
-        {
-            isSlowedDown = false;
-            return;
-        }
-
-        if (!gameIsPaused)
-        {
-            slowedEffectRamainingTime -= Time.deltaTime;
-
-            MoveUp(verticalSpeed / 2);
-            Rotate(rotationSpeed / 2);
-        }
+        MoveUp(verticalSpeed / 2);
+        Rotate(rotationSpeed / 1.5f);
+        slowedEffectRamainingTime -= Time.deltaTime;
     }
 
     private void ResetPosition(float distance)

@@ -16,7 +16,6 @@ public class BlackBird : Bird
 
     private void DisplayFx(int score)
     {
-        //var fx = fxSpawner.DisplayPointsFxOnParent(score, true, transform.position, birdSpawner.birdsParent);
         var fx = fxSpawner.DisplayPointsFx(score, true, transform.position);
         fx.transform.localScale = new Vector3(0.45f, 0.45f, 0.45f);
     }

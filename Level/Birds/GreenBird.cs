@@ -1,12 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 public class GreenBird : Bird
 {
     protected override void HitReward()
     {
-        levelManager.SlowDown(6);
+        levelManager.SlowDown(7);
         SoundManager.Instance.PlayGreenBirdClip();
     }
 }

@@ -4,14 +4,12 @@ using GooglePlayGames.BasicApi;
 
 public static class GooglePlayServicesManager
 {
-    public static bool IsConnectedToGooglePlayServices { get; private set; }
-
     public static void AuthenticateToGooglePlayServices()
     {
         if (Application.internetReachability == NetworkReachability.NotReachable)
         {
-            IsConnectedToGooglePlayServices = false;
             Debug.Log("Unable to connect to Google Play Services. No internet connection");
+            GameManager.Instance.SetConnectedToGooglePlayServicesStatus(false);
             return;
         }
 
@@ -29,15 +27,13 @@ public static class GooglePlayServicesManager
     {
         if (signInStatus == SignInStatus.Success)
         {
-            IsConnectedToGooglePlayServices = true;
-            GameManager.Instance.SetConnectedToGooglePlayServicesStatus(true);
             Debug.Log("Sucessfull connection to Google Play Services");
+            GameManager.Instance.SetConnectedToGooglePlayServicesStatus(true);
         }
         else
         {
-            IsConnectedToGooglePlayServices = true;
-            GameManager.Instance.SetConnectedToGooglePlayServicesStatus(false);
             Debug.LogWarning($"Failed to connect to Google Play Services. Status: {signInStatus}");
+            GameManager.Instance.SetConnectedToGooglePlayServicesStatus(false);
         }
     }
 

@@ -1,4 +1,4 @@
-    using System.Collections;
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -41,6 +41,6 @@ public class PowerButtonAnimation : MonoBehaviour
 
     private void OnDisable()
     {
-        StopCoroutine(Animate());
+        StopAllCoroutines();
     }
 }

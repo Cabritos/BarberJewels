@@ -5,15 +5,15 @@ using TMPro;
 
 public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
-    [SerializeField] BannerAd banner;
-    TMP_Text text;
     [SerializeField] string adUnitId = "Interstitial_Android";
+    [SerializeField] BannerAd banner;
+    TMP_Text buttonText;
 
     bool adIsLoaded = false;
 
     private void Awake()
     {
-        text = GetComponentInChildren<TMP_Text>();
+        buttonText = GetComponentInChildren<TMP_Text>();
     }
 
     private void Start()
@@ -35,17 +35,17 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
     private void InhabilitateButton()
     {
         GetComponent<Button>().interactable = false;
-        var color = text.color;
+        var color = buttonText.color;
         color.a = 0.5f;
-        text.color = color;
+        buttonText.color = color;
     }
 
     private void HabilitateButton()
     {
         GetComponent<Button>().interactable = true;
-        var color = text.color;
+        var color = buttonText.color;
         color.a = 1;
-        text.color = color;
+        buttonText.color = color;
     }
 
     public void LoadAd()

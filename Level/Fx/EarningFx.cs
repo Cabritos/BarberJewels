@@ -25,7 +25,7 @@ public class EarningFx : MonoBehaviour, IRecyclable
     [SerializeField] float fadeDuration;
 
     Transform target;
-    bool isTraveling = false;
+    bool isMoving = false;
     [SerializeField] float flyingSpeed = 0.3f;
     Transform cameraTransform;
 
@@ -42,11 +42,11 @@ public class EarningFx : MonoBehaviour, IRecyclable
 
     private void OnEnable()
     {
-        SetToDefaultValues();
+        SetValuesToDefault();
         InactivateTextsGameObjects();
     }
 
-    private void SetToDefaultValues()
+    private void SetValuesToDefault()
     {
         rotate = false;
         hasHeart = false;
@@ -60,28 +60,35 @@ public class EarningFx : MonoBehaviour, IRecyclable
         highlightedText.transform.localScale = defaultScale;
         heart.transform.localScale = defaultScale;
 
-        isTraveling = false;
+        isMoving = false;
         trail.SetActive(false);
     }
 
     private void Update()
     {
-        if (isTraveling) TravelToTarget();
+        if (isMoving)
+        {
+            MoveToTarget();
+            LookAtCamera();
+
+            if (Vector3.Distance(target.position, transform.position) < 0.5f)
+            {
+                Recycle();
+            }
+        }
         
         Rotate();
     }
 
-    private void TravelToTarget()
+    private void MoveToTarget()
     {
         transform.LookAt(target);
         transform.Translate(Vector3.forward * Time.deltaTime * flyingSpeed);
+    }
 
+    private void LookAtCamera()
+    {
         currentScoreText.transform.rotation = Quaternion.LookRotation(currentScoreText.transform.position - cameraTransform.position);
-
-        if (Vector3.Distance(target.position, transform.position) < 0.5f)
-        {
-            Recycle();
-        }
     }
 
     private void Rotate()
@@ -208,7 +215,7 @@ public class EarningFx : MonoBehaviour, IRecyclable
     private void StartTravelAnimation(Transform target)
     {
         this.target = target;
-        isTraveling = true;
+        isMoving = true;
     }
 
     private IEnumerator ShrinkAnimation(TMP_Text target, float duration)
@@ -227,5 +234,10 @@ public class EarningFx : MonoBehaviour, IRecyclable
     public void Recycle()
     {
         objectsPool.Recycle(gameObject);
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 }

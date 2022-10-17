@@ -27,4 +27,9 @@ public class FireworksFx : MonoBehaviour, IRecyclable
     {
         this.objectsPool = objectsPool;
     }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+    }
 }

@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class FireworksSpawner : MonoBehaviour
 { 
-    [SerializeField] GameObject prefab;
+    [SerializeField] GameObject fxPrefab;
+    Vector3 fxPosition;
+    Quaternion fxRotation;
 
     [SerializeField] float minRandomSpawnTime;
     [SerializeField] float maxRandomSpawnTime;
@@ -41,36 +43,33 @@ public class FireworksSpawner : MonoBehaviour
 
     private void InstantiateFireworks()
     {
-        Vector3 position;
-        Quaternion rotation;
-        SetRandomPositionAndRotation(out position, out rotation);
-        var fireworksGameObject = objectsPool.Instantiate(prefab, position, rotation, transform);
-
-        SetRandomScale(fireworksGameObject);
+        SetRandomPosition();
+        SetRandomRotation();
+        var fireworksGameObject = objectsPool.Instantiate(fxPrefab, fxPosition, fxRotation, transform);
+        ScaleToRandomScale(fireworksGameObject);
         InjectObjectsPool(fireworksGameObject);
     }
 
-    private void SetRandomPositionAndRotation(out Vector3 position, out Quaternion rotation)
+    private void SetRandomPosition()
     {
-        position = new Vector3(UnityEngine.Random.Range(-4, 6), UnityEngine.Random.Range(-7, 10), 5);
-        rotation = Quaternion.Euler(GetRandomRotation());
+        fxPosition = new Vector3(UnityEngine.Random.Range(-4, 6), UnityEngine.Random.Range(-7, 10), 5);
+    }
+
+    private void SetRandomRotation()
+    {
+        fxRotation = Quaternion.Euler(new Vector3(0, 0, UnityEngine.Random.Range(-maxRandomRotation, maxRandomRotation)));
+    }
+
+    private void ScaleToRandomScale(GameObject fireworksGameObject)
+    {
+        var randomScale = UnityEngine.Random.Range(minRandomScale, maxRandomScale);
+        fireworksGameObject.transform.localScale = new Vector3(randomScale, randomScale, randomScale);
     }
 
     private void InjectObjectsPool(GameObject fireworksGameObject)
     {
         var fireworksFx = fireworksGameObject.GetComponent<FireworksFx>();
         fireworksFx.SetObjectsPool(objectsPool);
-    }
-
-    private void SetRandomScale(GameObject fireworksGameObject)
-    {
-        var randomScale = UnityEngine.Random.Range(minRandomScale, maxRandomScale);
-        fireworksGameObject.transform.localScale = new Vector3(randomScale, randomScale, randomScale);
-    }
-
-    private Vector3 GetRandomRotation()
-    {
-        return new Vector3 (0, 0, UnityEngine.Random.Range(-maxRandomRotation, maxRandomRotation));
     }
 
     private void OnDisable()

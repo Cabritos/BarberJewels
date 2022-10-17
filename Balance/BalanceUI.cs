@@ -10,26 +10,18 @@ public class BalanceUI : MonoBehaviour
     [SerializeField] TMP_Text levelScoreText;
     [SerializeField] TMP_Text totalScoreLabel;
     [SerializeField] TMP_Text totalScoreText;
-    [SerializeField] Text nextButton;
+    [SerializeField] Text nextButtonText;
     [SerializeField] float animationInterval;
 
     bool endlessGame;
-
-    private void Awake()
-    {
-        var gameManager = GameManager.Instance;
-
-        if (gameManager.EndlessGame || gameManager.HasLost)
-        {
-            nextButton.text = "Leaderboard";
-        }
-    }
+    bool hasLost;
 
     private void Start()
     {
         SoundManager.Instance.PlayMenuMusic();
-        endlessGame = GameManager.Instance.EndlessGame;
-        
+
+        SetUp();
+
         if (endlessGame)
         {
             StartCoroutine(EndlessModeBalance());
@@ -37,6 +29,24 @@ public class BalanceUI : MonoBehaviour
         else
         {
             StartCoroutine(RegularModeBalance());
+        }
+    }
+
+    private void SetUp()
+    {
+        endlessGame = GameManager.Instance.EndlessGame;
+
+        var gameManager = GameManager.Instance;
+        hasLost = gameManager.HasLost;
+
+        if (hasLost)
+        {
+            Camera.main.backgroundColor = Color.black;
+        }
+
+        if (gameManager.EndlessGame || hasLost)
+        {
+            nextButtonText.text = "Leaderboard";
         }
     }
 
@@ -108,7 +118,7 @@ public class BalanceUI : MonoBehaviour
 
     public void RespondToNextButtonPress()
     {
-        if (GameManager.Instance.HasLost)
+        if (hasLost)
         {
             TryToShowLeaderboard();
         }
@@ -136,5 +146,10 @@ public class BalanceUI : MonoBehaviour
     public void MainMenu()
     {
         GameManager.Instance.LoadMainMenu();
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
     }
 }

@@ -3,10 +3,11 @@ using UnityEngine.SceneManagement;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
-    public bool IsConnectedToGooglePlayServices { get; private set; }
-    public ErrorUi ErrorUi { get; private set; }
+    bool isConnectedToGooglePlayServices = false;
     AchivementsManager achivementManager;
+    GoogleEventsReporter googleEventsReporter;
     BannerAd bannerAd;
+    ErrorUi errorUi;
 
     LevelManager currentLevelManager;
     [SerializeField] LevelConfigListSO levelConfigSO;
@@ -29,11 +30,17 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     protected override void Awake()
     {
         base.Awake();
-        ErrorUi = GetComponent<ErrorUi>();
+        CacheReferences();
+        GooglePlayServicesManager.AuthenticateToGooglePlayServices();
+    }
+
+    private void CacheReferences()
+    {
+        errorUi = GetComponent<ErrorUi>();
         progressionManager = GetComponent<EndlessGameProgressionManager>();
         achivementManager = GetComponent<AchivementsManager>();
         bannerAd = GetComponent<BannerAd>();
-        GooglePlayServicesManager.AuthenticateToGooglePlayServices();
+        googleEventsReporter = GetComponent<GoogleEventsReporter>();
     }
 
     private void Start()
@@ -44,57 +51,47 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     public void StartNewRegularGame()
     {
         Debug.Log("Starting new regular game");;
-        ReportNewGame();
         EndlessGame = false;
         HasLost = false;
-        ResetScores();
         CurrentLevel = 0;
 
 #if UNITY_EDITOR
         if (onLevelDebug) CurrentLevel = debugLevel - 1;
 #endif
 
+        ResetScores();
+        achivementManager.ReportNewGame();
         LoadNextLevel();
     }
 
     public void LoadNextLevel()
     {
-        Debug.Log("Loading level");
         CurrentLevel++;
+        googleEventsReporter.ReportLevel(CurrentLevel);
         LoadLevelScene();
     }
 
     private void LoadLevelScene()
     {
+        Debug.Log("Loading level scene");
         HideBannerAd();
         Time.timeScale = 1;
         SceneManager.LoadScene("Level");
     }
 
-    private void ReportNewGame()
-    {
-        if (!ValidateConnectivity())
-        {
-            Debug.LogWarning("Unable to report new game");
-            return;
-        }
-
-        achivementManager.ReportNewGame();
-    }
-
     public void StartNewEndlessGame()
     {
         Debug.Log("Starting new endless game");
-        ReportNewGame();
-        ResetScores();
         EndlessGame = true;
-        achivementManager.ReportEndlessGame();
+        HasLost = false;
         iterationNumber = 0;
 
 #if UNITY_EDITOR
         if (onLevelDebug) iterationNumber = debugLevel - 1;
 #endif
-
+        ResetScores();
+        achivementManager.ReportNewGame();
+        achivementManager.ReportEndlessGame();
         LoadLevelScene();
     }
 
@@ -105,7 +102,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         PreviousTotalScore = 0;
     }
 
-    private void HideBannerAd()
+    public void HideBannerAd()
     {
         bannerAd.HideAd();
     }
@@ -155,7 +152,6 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     private void EndLevel(int score, int jewelHits)
     {
         Debug.Log("Ending level");
-
         Time.timeScale = 1;
         ProcessScores(score, jewelHits);
 
@@ -201,16 +197,16 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     public bool ValidateConnectivity()
     {
-        return IsConnectedToGooglePlayServices || Application.internetReachability != NetworkReachability.NotReachable;
+        return isConnectedToGooglePlayServices && Application.internetReachability != NetworkReachability.NotReachable;
     }
 
     public bool ValidateConnectivityOrShowError()
     {
-        if (IsConnectedToGooglePlayServices)
+        if (isConnectedToGooglePlayServices)
         {
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
-                ErrorUi.ShowError(Errors.InternetConnectionNeededGeneric);
+                errorUi.ShowError(Errors.InternetConnectionNeededGeneric);
                 Debug.LogWarning("Failed to proceed due lack of internet connection");
                 return false;
             }
@@ -222,7 +218,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         }
         else
         {
-            ErrorUi.ShowError(Errors.GooglePlayConnectionNeeded);
+            errorUi.ShowError(Errors.GooglePlayConnectionNeeded);
             Debug.LogWarning("Failed to proceed because Google Play Services is not connected");
             return false;
         }
@@ -234,17 +230,11 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         bannerAd.LoadAndShowAd();
     }
 
-    public LevelConfigSO GetNewIterationConfig()
-    {
-        iterationNumber++;
-        Debug.Log("New iteration: " + iterationNumber);
-        return progressionManager.GetNewConfig(iterationNumber);
-    }
-
     public LevelConfigSO GetCurrentConfig()
     {
         if (EndlessGame)
         {
+            googleEventsReporter.ReportIteration(0);
             return progressionManager.GetBaseConfig();
         }
         else
@@ -255,11 +245,27 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     public LevelConfigSO GetLevelConfig(int levelId)
     {
-        return levelConfigSO.GetLevelConfig(levelId);
+        if (CurrentLevel <= 20)
+        {
+            return levelConfigSO.GetLevelConfig(levelId);
+        }
+        else
+        {
+            return progressionManager.GetNewFakeLevelConfig(levelId);
+        }
+    }
+
+
+    public LevelConfigSO GetNewIterationConfig()
+    {
+        iterationNumber++;
+        Debug.Log("New iteration: " + iterationNumber);
+        googleEventsReporter.ReportIteration(iterationNumber);
+        return progressionManager.GetNewEndlessGameIterationConfig(iterationNumber);
     }
 
     public void SetConnectedToGooglePlayServicesStatus(bool status)
     {
-        IsConnectedToGooglePlayServices = status;
+        isConnectedToGooglePlayServices = status;
     }
 }

@@ -25,22 +25,6 @@ public class Bird : MonoBehaviour, IRecyclable, IHitable
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
-    private void HandlePause(bool isPaused)
-    {
-        this.isPaused = isPaused;
-    }
-
-    public void SetType(ColorType type, Color color)
-    {
-        this.Type = type;
-        SetSpriteColor(color);
-    }
-
-    private void SetSpriteColor(Color color)
-    {
-        spriteRenderer.color = color;
-    }
-
     public void ReleaseNewBird(LevelManager levelManager, ObjectsPool objectsPool, float speed, bool fliesToRight, bool isOnMenu)
     {
         this.speed = speed;
@@ -51,13 +35,6 @@ public class Bird : MonoBehaviour, IRecyclable, IHitable
         SubscribeToPause();
         FlipSpriteToFlightDirection(fliesToRight);
         StartMovement();
-    }
-
-    private void SubscribeToPause()
-    {
-        if (isOnMenu) return;
-        pause.GamePaused += HandlePause;
-        isPaused = pause.IsPaused();
     }
 
     private void SetBirdSpawnerRereferences(ObjectsPool objectsPool, LevelManager levelManager)
@@ -71,7 +48,19 @@ public class Bird : MonoBehaviour, IRecyclable, IHitable
         fxSpawner = levelManager.FxSpawner;
         pause = levelManager.Pause;
     }
-        
+
+    private void SubscribeToPause()
+    {
+        if (isOnMenu) return;
+        pause.GamePaused += HandlePause;
+        isPaused = pause.IsPaused();
+    }
+
+    private void HandlePause(bool isPaused)
+    {
+        this.isPaused = isPaused;
+    }
+
     private void FlipSpriteToFlightDirection(bool fliesToRight)
     {
         foreach (var spriteRender in GetComponentsInChildren<SpriteRenderer>())
@@ -95,6 +84,17 @@ public class Bird : MonoBehaviour, IRecyclable, IHitable
     public void StopMovement()
     {
         isFlying = false;
+    }
+
+    public void SetType(ColorType type, Color color)
+    {
+        this.Type = type;
+        SetSpriteColor(color);
+    }
+
+    private void SetSpriteColor(Color color)
+    {
+        spriteRenderer.color = color;
     }
 
     private void Update()

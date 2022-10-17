@@ -91,6 +91,7 @@ public class LevelUI : MonoBehaviour
     private void OnDisable()
     {
         UnsubcribeToEvents();
+        StopAllCoroutines();
     }
 
     private void UnsubcribeToEvents()
@@ -149,6 +150,39 @@ public class LevelUI : MonoBehaviour
         StartCoroutine(Greating());
     }
 
+    private void GenerateJewelsDictionary()
+    {
+        jewelColorsDictionary.Clear();
+
+        var jewelTemplates = jewelTemplatesList.GetJewelTemplates();
+        var playableJewels = jewelManager.PlayableJewels;
+
+        for (int i = 1; i <= playableJewels; i++)
+        {
+            jewelColorsDictionary.Add(jewelTemplates[i].jewelType, jewelTemplates[i].color);
+        }
+    }
+    private void CheckUnusedColors()
+    {
+        DisableUnusedSelectorButton(ColorType.white, whiteSelectorButton);
+        DisableUnusedSelectorButton(ColorType.purple, purpleSelectorButton);
+        DisableUnusedSelectorButton(ColorType.pink, pinkSelectorButton);
+        DisableUnusedSelectorButton(ColorType.orange, orangeSelectorButton);
+    }
+
+    private void DisableUnusedSelectorButton(ColorType color, GameObject button)
+    {
+        if (!jewelColorsDictionary.ContainsKey(color))
+        {
+            button.SetActive(false);
+        }
+    }
+
+    public void UpdateSelection(ColorType type)
+    {
+        selectedColorImage.color = jewelColorsDictionary[type];
+    }
+
     private IEnumerator Greating()
     {
         var levelManager = level.GetComponent<LevelManager>();
@@ -197,40 +231,6 @@ public class LevelUI : MonoBehaviour
         {
             pauseCanvas.SetActive(isPaused);
         }
-    }
-
-    private void GenerateJewelsDictionary()
-    {
-        jewelColorsDictionary.Clear();
-
-        var jewelTemplates = jewelTemplatesList.GetJewelTemplates();
-        var playableJewels = jewelManager.PlayableJewels;
-
-        for (int i = 1; i <= playableJewels; i++)
-        {
-            jewelColorsDictionary.Add(jewelTemplates[i].jewelType, jewelTemplates[i].color);
-        }
-    }
-
-    private void CheckUnusedColors()
-    {
-        DisableUnusedSelectorButton(ColorType.white, whiteSelectorButton);
-        DisableUnusedSelectorButton(ColorType.purple,purpleSelectorButton);
-        DisableUnusedSelectorButton(ColorType.pink, pinkSelectorButton);
-        DisableUnusedSelectorButton(ColorType.orange, orangeSelectorButton);
-    }
-
-    private void DisableUnusedSelectorButton(ColorType color, GameObject button)
-    {
-        if (!jewelColorsDictionary.ContainsKey(color))
-        {
-            button.SetActive(false);
-        }
-    }
-
-    public void UpdateSelection(ColorType type)
-    {
-        selectedColorImage.color = jewelColorsDictionary[type];
     }
 
     private void OnBirdHit(ColorType type)

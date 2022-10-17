@@ -4,10 +4,10 @@ using System;
 
 public class LevelManager : MonoBehaviour
 {
-    public event Action<float> ResetingPositions;
-    public event Action Rewinding;
-    public event Action<float> SlowingDown;
     public event Action StartingLevel;
+    public event Action<float> ResetingPositions;
+    public event Action<float> Rewinding;
+    public event Action<float> SlowingDown;
 
     public Score Score { get; private set; }
     public Lives Lives { get; private set; }
@@ -17,12 +17,13 @@ public class LevelManager : MonoBehaviour
     public ObjectsPool ObjectsPool { get; private set; }
     public Pause Pause { get; private set; }
 
+    LevelConfigSO currentLevelConfig;
+
     [SerializeField] LevelUI levelUI;
     [SerializeField] MainMovement mainAxisMovement;
     [SerializeField] MainMovement poleMovement;
     float initialVerticalOffset;
 
-    LevelConfigSO currentLevelConfig;
 
     private void Awake()
     {
@@ -53,7 +54,7 @@ public class LevelManager : MonoBehaviour
 
     private void SetupLevel()
     {
-        Debug.Log("Setting up level");
+        Debug.Log("Setting up level in level manager");
         SetupPoleAndCamera();
         SetupJewelsManager();
         SetupBirdsSpawner();
@@ -125,9 +126,10 @@ public class LevelManager : MonoBehaviour
         StartingLevel = null;
     }
 
-    public void Rewind()
+    public void Rewind(float time)
     {
-        Rewinding?.Invoke();
+        Rewinding?.Invoke(time);
+        SoundManager.Instance.PlayPurpleBirdClip();
     }
 
     public void SlowDown(float duration)

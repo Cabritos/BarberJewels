@@ -33,6 +33,6 @@ public class BirdAnimator : MonoBehaviour
 
     private void OnDisable()
     {
-        StopCoroutine(FlyAnimation());
+        StopAllCoroutines();
     }
 }

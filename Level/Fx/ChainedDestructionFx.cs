@@ -1,24 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(AudioSource))]
 public class ChainedDestructionFx : MonoBehaviour
 {
-    ObjectsPool objectsPool;
-    List<Transform> targets;
     LevelManager levelManager;
+    JewelManager jewelManager;
+    ObjectsPool objectsPool;
     Pause pause;
+
+    Transform target;
+    Vector3 targetPosition;
+
     [SerializeField] float speed = 2f;
-    int currentTarget = 0;
     bool active = false;
     bool isPaused = false;
 
+    AudioSource audioSource;
     [SerializeField] AudioClip startClip;
     [SerializeField] AudioClip hitClip;
     [SerializeField] AudioClip endClip;
-    AudioSource audioSource;
 
     private void Awake()
     {
@@ -26,15 +26,10 @@ public class ChainedDestructionFx : MonoBehaviour
         audioSource.clip = startClip;
     }
 
-    private void ResetPosition(float distance)
-    {
-        var position = transform.position;
-        transform.position = new Vector3(position.x, position.y - distance, position.z);
-    }
-
     public void Setup(LevelManager levelManager)
     {
-        GetTargets(levelManager);
+        jewelManager = levelManager.JewelManager;
+        if (!GetNewTarget()) Destroy(gameObject);
 
         this.levelManager = levelManager;
         pause = levelManager.Pause;
@@ -46,12 +41,17 @@ public class ChainedDestructionFx : MonoBehaviour
         audioSource.Play();
     }
 
-    private void GetTargets(LevelManager levelManager)
+    private bool GetNewTarget()
     {
-        var jewelManager = levelManager.JewelManager;
-        targets = jewelManager.ReturnAllJewelTranformsInGameArea().ToList();
-        targets.OrderBy(transform => transform.position.y);
-        if (targets.Count == 0) Destroy(gameObject);
+        target = jewelManager.GetBottomJewelInPlayArea();
+
+        return target != null;
+    }
+
+    private void ResetPosition(float distance)
+    {
+        var position = transform.position;
+        transform.position = new Vector3(position.x, position.y - distance, position.z);
     }
 
     private void OnPause(bool isPaused)
@@ -73,35 +73,40 @@ public class ChainedDestructionFx : MonoBehaviour
     {
         if (!active || isPaused) return;
 
-        if (targets.Count == 0 || targets[currentTarget] == null) StopTrail();
+        GetTargetOrStop();
 
-        var targetPosition = targets[currentTarget].position;
-        transform.LookAt(targetPosition);
-
-        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        targetPosition = target.position;
+        MoveToTarget();
 
         if (Vector3.Distance(targetPosition, transform.position) < 0.8f)
         {
-            targets[currentTarget].GetComponent<Jewel>().HandleCorrectHit();
+            target.GetComponent<Jewel>().HandleCorrectHit();
             SoundManager.Instance.PlayClip(hitClip);
 
-            if (currentTarget == targets.Count - 1)
-            {
-                StopTrail();
-            }
-            else
-            {
-                currentTarget++;
-            }
+            GetTargetOrStop();
+        }
+    }
+
+    private void GetTargetOrStop()
+    {
+        if (!GetNewTarget())
+        {
+            StopTrail();
         }
     }
 
     private void StopTrail()
     {
         active = false;
-        Invoke(nameof(Destroy), 0.25f);
         Invoke(nameof(StopTrailSound), 0.25f);
+        Invoke(nameof(Destroy), 0.25f);
         SoundManager.Instance.PlayClip(endClip);
+    }
+
+    private void MoveToTarget()
+    {
+        transform.LookAt(targetPosition);
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
     }
 
     private void StopTrailSound()
@@ -114,10 +119,5 @@ public class ChainedDestructionFx : MonoBehaviour
         if (pause != null) pause.GamePaused -= OnPause;
         if (levelManager != null) levelManager.ResetingPositions -= ResetPosition;
         Destroy(gameObject);
-    }
-
-    public void Recycle()
-    {
-        objectsPool.Recycle(gameObject);
     }
 }

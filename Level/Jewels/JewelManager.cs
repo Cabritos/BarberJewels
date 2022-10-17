@@ -92,6 +92,7 @@ public class JewelManager : MonoBehaviour
     private void OnDisable()
     {
         UnsubscribeToEvents();
+        StopAllCoroutines();
     }
 
     private void UnsubscribeToEvents()
@@ -145,7 +146,7 @@ public class JewelManager : MonoBehaviour
     }
     private void EnqueJewelPositions()
     {
-        foreach (var jewelPosition in CalculateJewelPositions())
+        foreach (var jewelPosition in CalculateRemainingJewelPositions())
         {
             remainingJewelPositionsQueue.Enqueue(jewelPosition);
         }
@@ -154,7 +155,7 @@ public class JewelManager : MonoBehaviour
     }
 
     float offset = 0;
-    private IEnumerable<Vector3> CalculateJewelPositions()
+    private IEnumerable<Vector3> CalculateRemainingJewelPositions()
     {
         var verticalDistance = ringHeight / jewelsPerRing;
 
@@ -316,7 +317,14 @@ public class JewelManager : MonoBehaviour
         RemoveJewel(bottomJewel.gameObject);
         SoundManager.Instance.PlayJewelLostClip();
 
-        if (remainingLives <= 0) levelManager.EndLevel(true);
+        if (remainingLives <= 0)
+        {
+            levelManager.EndLevel(true);
+        }
+        else
+        {
+            levelManager.Rewind(0.8f);
+        }
     }
 
     private void RemoveJewel(GameObject jewelGameObject)
@@ -327,22 +335,6 @@ public class JewelManager : MonoBehaviour
         jewelGameObject.GetComponent<Jewel>().Recycle();
 
         if (wasBottom) UpdateBottomJewel();
-    }
-
-    public void HitAllJewels(int ammount)
-    {
-        StartCoroutine(HitAllJewelsRoutine(ammount));
-    }
-
-    private IEnumerator HitAllJewelsRoutine(int ammount)
-    {
-        for (int i = 0; i < ammount; i++)
-        {
-            if (currentJewels.Count == 0) yield break;
-
-            HandleJewelHit(bottomJewel.gameObject.GetComponent<Jewel>());
-            yield return new WaitForSeconds(0.05f);
-        }
     }
 
     public void HitAllJewelsOfColor(ColorType type)
@@ -366,6 +358,73 @@ public class JewelManager : MonoBehaviour
                 HandleJewelHit(jewel);
                 yield return new WaitForSeconds(0.05f);
             }
+        }
+    }
+
+    public Transform GetBottomJewelInPlayArea()
+    {
+        if (!NoJewelsAreInGameArea())
+        {
+            return bottomJewel;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void ReplaceSomeJewels()
+    {
+        StartCoroutine(ReplaceJewelsRoutine());
+    }
+
+    private IEnumerator ReplaceJewelsRoutine()
+    {
+        var type = GetRandomJewelType();
+
+        for (int i = 0; i < currentJewels.Count; i++)
+        {
+            if (UnityEngine.Random.Range(0, 9) > 8) continue;
+
+            var jewel = currentJewels[i];
+            if (!IsInGameArea(jewel.transform)) continue;
+
+            var position = jewel.position;
+            RemoveJewel(jewel.gameObject);
+            InstantiateNewJewel(type, position);
+
+            fxSpawner.DisplayFx(position);
+            yield return new WaitForSeconds(0.03f);
+        }
+    }
+
+    public JewelTemplatesListSO GetJewelTemplatesListSO()
+    {
+        return jewelTemplatesList;
+    }
+
+    private void OnDestroy()
+    {
+        JewelHit = null;
+        RemainingJewelsUpdated = null;
+    }
+}
+
+/*
+
+    public void HitAllJewels(int ammount)
+    {
+        StartCoroutine(HitAllJewelsRoutine(ammount));
+    }
+
+    private IEnumerator HitAllJewelsRoutine(int ammount)
+    {
+        for (int i = 0; i < ammount; i++)
+        {
+            if (currentJewels.Count == 0) yield break;
+
+            HandleJewelHit(bottomJewel.gameObject.GetComponent<Jewel>());
+            yield return new WaitForSeconds(0.05f);
         }
     }
 
@@ -399,39 +458,4 @@ public class JewelManager : MonoBehaviour
         }
     }
 
-    public void ReplaceSomeJewels()
-    {
-        StartCoroutine(ReplaceJewelsRoutine());
-    }
-
-    private IEnumerator ReplaceJewelsRoutine()
-    {
-        var type = GetRandomJewelType();
-
-        for (int i = 0; i < currentJewels.Count; i++)
-        {
-            if (UnityEngine.Random.Range(0, 9) > 7) continue;
-
-            var jewel = currentJewels[i];
-            if (!IsInGameArea(jewel.transform)) continue;
-
-            var position = jewel.position;
-            RemoveJewel(jewel.gameObject);
-            InstantiateNewJewel(type, position);
-
-            fxSpawner.DisplayFx(position);
-            yield return new WaitForSeconds(0.03f);
-        }
-    }
-
-    public JewelTemplatesListSO GetJewelTemplatesListSO()
-    {
-        return jewelTemplatesList;
-    }
-
-    private void OnDestroy()
-    {
-        JewelHit = null;
-        RemainingJewelsUpdated = null;
-    }
-}
+*/

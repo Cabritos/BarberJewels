@@ -47,6 +47,7 @@ public class Pause : MonoBehaviour
     private void PauseGame()
     {
         Debug.Log("Game paused");
+        GameManager.Instance.HideBannerAd();
         Time.timeScale = 0;
         isPaused = true;
         ShowMenu();

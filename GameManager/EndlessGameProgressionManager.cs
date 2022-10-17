@@ -6,66 +6,58 @@ using UnityEngine;
 public class EndlessGameProgressionManager : MonoBehaviour
 {
     [SerializeField] LevelConfigListSO endlesLevelConfigList;
-    LevelConfigSO baseConfig;
+    LevelConfigSO endlessBaseConfig;
+    [SerializeField] LevelConfigSO level20Config;
+    LevelConfigSO currentBaseConfig;
     LevelConfigSO newConfig;
 
-    [SerializeField] public float VerticalSpeedIncrement;
-    [SerializeField] public float RotationSpeedIncrement;
-    [SerializeField] public float RotationSpeedMaxValue;
-    [SerializeField] public float RingHeightDecrement;
-    [SerializeField] public float RingHeightMinValue;
-    [SerializeField] public float JewelsPerRingDecrement;
-    [SerializeField] public float JewelsPerRingMaxValue;
-    [SerializeField] public int AdditionalJewelsAmmount;
-    [SerializeField] public int AdditionalJewelsAmmountMaxValue;
-    [SerializeField] public float BirdsMinRandomSpawnDecrement;
-    [SerializeField] public float BirdsMinRandomSpawnMinValue;
-    [SerializeField] public float BirdsMaxRandomSpawnDecrement;
-    [SerializeField] public float BirdsMaxRandomSpawnMinValue;
-
-    int iterationNumber;
+    [SerializeField] ProgressionSettingsSO endlessSettings;
+    [SerializeField] ProgressionSettingsSO fakeLevelsSettings;
+    ProgressionSettingsSO currentSettings;
 
     private void Awake()
     {
-        baseConfig = endlesLevelConfigList.GetLevelConfig(0);
+        endlessBaseConfig = endlesLevelConfigList.GetLevelConfig(0);
         newConfig = endlesLevelConfigList.GetLevelConfig(1);
-
-        ResetConfig();
-    }
-
-    private void ResetConfig()
-    {
-        newConfig.VerticalSpeed = baseConfig.VerticalSpeed;
-        newConfig.RotationSpeed = baseConfig.RotationSpeed;
-        newConfig.RingHeight = baseConfig.RingHeight;
-        newConfig.JewelsPerRing = baseConfig.JewelsPerRing;
-        newConfig.JewelsAmmount = baseConfig.JewelsAmmount;
-        newConfig.BirdsMinRandomSpawnTime = baseConfig.BirdsMinRandomSpawnTime;
-        newConfig.BirdsMaxRandomSpawnTime = baseConfig.BirdsMaxRandomSpawnTime;
     }
 
     public LevelConfigSO GetBaseConfig()
     {
-        return baseConfig;
+        return endlessBaseConfig;
     }
 
-    public LevelConfigSO GetNewConfig(int iterationNumber)
+    public LevelConfigSO GetNewEndlessGameIterationConfig(int iterationNumber)
     {
-        this.iterationNumber = iterationNumber;
+        currentBaseConfig = endlessBaseConfig;
+        currentSettings = endlessSettings;
+        newConfig.EndlessMode = true;
+        return GetNewConfig(iterationNumber);
+    }
 
-        newConfig.VerticalSpeed = baseConfig.VerticalSpeed + (VerticalSpeedIncrement * iterationNumber);
+    public LevelConfigSO GetNewFakeLevelConfig(int levelNumber)
+    {
+        currentBaseConfig = level20Config;
+        currentSettings = fakeLevelsSettings;
+        newConfig.EndlessMode = false;
+        newConfig.Id = levelNumber;
+        return GetNewConfig(levelNumber - 20);
+    }
 
-        newConfig.RotationSpeed = Mathf.Clamp(baseConfig.RotationSpeed + (RotationSpeedIncrement * iterationNumber), 0, RotationSpeedMaxValue);
+    private LevelConfigSO GetNewConfig(int multiplier)
+    {
+        newConfig.VerticalSpeed = currentBaseConfig.VerticalSpeed + (currentSettings.VerticalSpeedIncrement * multiplier);
 
-        newConfig.RingHeight = Mathf.Clamp(baseConfig.RingHeight - (RingHeightDecrement * iterationNumber), RingHeightMinValue, Mathf.Infinity);
+        newConfig.RotationSpeed = Mathf.Clamp(currentBaseConfig.RotationSpeed + (currentSettings.RotationSpeedIncrement * multiplier), 0, currentSettings.RotationSpeedMaxValue);
 
-        newConfig.JewelsPerRing = Mathf.Clamp(baseConfig.JewelsPerRing + (JewelsPerRingDecrement * iterationNumber), 0, JewelsPerRingMaxValue);
+        newConfig.RingHeight = Mathf.Clamp(currentBaseConfig.RingHeight - (currentSettings.RingHeightDecrement * multiplier), currentSettings.RingHeightMinValue, Mathf.Infinity);
 
-        newConfig.JewelsAmmount = Mathf.Clamp(baseConfig.JewelsAmmount + (AdditionalJewelsAmmount * iterationNumber), 0, AdditionalJewelsAmmountMaxValue);
+        newConfig.JewelsPerRing = Mathf.Clamp(currentBaseConfig.JewelsPerRing + (currentSettings.JewelsPerRingDecrement * multiplier), 0, currentSettings.JewelsPerRingMaxValue);
 
-        newConfig.BirdsMinRandomSpawnTime = Mathf.Clamp(baseConfig.BirdsMinRandomSpawnTime - (BirdsMinRandomSpawnDecrement * iterationNumber), BirdsMinRandomSpawnMinValue, Mathf.Infinity);
+        newConfig.JewelsAmmount = Mathf.Clamp(currentBaseConfig.JewelsAmmount + (currentSettings.AdditionalJewelsAmmount * multiplier), 0, currentSettings.AdditionalJewelsAmmountMaxValue);
 
-        newConfig.BirdsMaxRandomSpawnTime = Mathf.Clamp(baseConfig.BirdsMaxRandomSpawnTime - (BirdsMaxRandomSpawnDecrement * iterationNumber), BirdsMaxRandomSpawnMinValue, Mathf.Infinity);
+        newConfig.BirdsMinRandomSpawnTime = Mathf.Clamp(currentBaseConfig.BirdsMinRandomSpawnTime - (currentSettings.BirdsMinRandomSpawnDecrement * multiplier), currentSettings.BirdsMinRandomSpawnMinValue, Mathf.Infinity);
+
+        newConfig.BirdsMaxRandomSpawnTime = Mathf.Clamp(currentBaseConfig.BirdsMaxRandomSpawnTime - (currentSettings.BirdsMaxRandomSpawnDecrement * multiplier), currentSettings.BirdsMaxRandomSpawnMinValue, Mathf.Infinity);
 
         return newConfig;
     }

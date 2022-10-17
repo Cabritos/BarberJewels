@@ -1,7 +1,5 @@
 using UnityEngine;
 using GooglePlayGames;
-using UnityEngine.SocialPlatforms;
-using System;
 
 public class AchivementsManager : MonoBehaviour
 {
@@ -46,6 +44,8 @@ public class AchivementsManager : MonoBehaviour
 
     public void ReportNewGame()
     {
+        if (!GameManager.Instance.ValidateConnectivity()) return;
+
         QuickReportIncementalProgress(GPGSIds.achievement_rookie_numbers, 1);
         QuickReportIncementalProgress(GPGSIds.achievement_more, 1);
         QuickReportIncementalProgress(GPGSIds.achievement_i_love_it, 1);
@@ -79,7 +79,7 @@ public class AchivementsManager : MonoBehaviour
         currentLevelManager.Rewinding += CountRewinds;
         currentLevelManager.SlowingDown += CountSlowDonws;
         currentLevelManager.Score.YellowBirdPowerEarned += CountYellowBirdPowersEarned;
-        currentLevelManager.Lives.OnLivesWon += CountLivesWon;
+        currentLevelManager.Lives.LivesWon += CountLivesWon;
         currentLevelManager.GetComponent<PlayerInput>().PowerButtonPressed += CountOrangePowers;
     }
 
@@ -102,7 +102,7 @@ public class AchivementsManager : MonoBehaviour
         slowDowns++;
     }
 
-    private void CountRewinds()
+    private void CountRewinds(float duration)
     {
         rewinds++;
     }
@@ -212,7 +212,7 @@ public class AchivementsManager : MonoBehaviour
         currentLevelManager.Rewinding -= CountRewinds;
         currentLevelManager.SlowingDown -= CountSlowDonws;
         currentLevelManager.Score.YellowBirdPowerEarned -= CountYellowBirdPowersEarned;
-        currentLevelManager.Lives.OnLivesWon -= CountLivesWon;
+        currentLevelManager.Lives.LivesWon -= CountLivesWon;
         currentLevelManager.GetComponent<PlayerInput>().PowerButtonPressed -= CountOrangePowers;
     }
 }
