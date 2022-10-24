@@ -11,6 +11,7 @@ public class BalanceUI : MonoBehaviour
     [SerializeField] TMP_Text totalScoreLabel;
     [SerializeField] TMP_Text totalScoreText;
     [SerializeField] Text nextButtonText;
+    [SerializeField] Text mainMenuButtonText;
     [SerializeField] float animationInterval;
 
     bool endlessGame;
@@ -20,7 +21,7 @@ public class BalanceUI : MonoBehaviour
     {
         SoundManager.Instance.PlayMenuMusic();
 
-        SetUp();
+        Setup();
 
         if (endlessGame)
         {
@@ -32,21 +33,20 @@ public class BalanceUI : MonoBehaviour
         }
     }
 
-    private void SetUp()
+    private void Setup()
     {
         endlessGame = GameManager.Instance.EndlessGame;
-
-        var gameManager = GameManager.Instance;
-        hasLost = gameManager.HasLost;
+        hasLost = GameManager.Instance.HasLost;
 
         if (hasLost)
         {
             Camera.main.backgroundColor = Color.black;
         }
 
-        if (gameManager.EndlessGame || hasLost)
+        if (endlessGame || hasLost)
         {
             nextButtonText.text = "Leaderboard";
+            mainMenuButtonText.text = "Main menu";
         }
     }
 

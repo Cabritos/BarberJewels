@@ -154,6 +154,7 @@ public class Bird : MonoBehaviour, IRecyclable, IHitable
     public void OnDisable()
     {
         if (isOnMenu) return;
+        if (pause == null) return;
         pause.GamePaused -= HandlePause;
     }
 }

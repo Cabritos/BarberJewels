@@ -7,123 +7,124 @@ public class GoogleEventsReporter : MonoBehaviour
     {
         switch (levelNumber)
         {
-            case 1: ReportEvent("CgkIsL2Cj_oUEAIQIg");
+            case 1:
+                ReportEvent(GPGSIds.event_level_1);
                 break;
 
             case 2:
-                ReportEvent("CgkIsL2Cj_oUEAIQJw");
+                ReportEvent(GPGSIds.event_level_2);
                 break;
 
             case 3:
-                ReportEvent("CgkIsL2Cj_oUEAIQKA");
+                ReportEvent(GPGSIds.event_level_3);
                 break;
 
             case 4:
-                ReportEvent("CgkIsL2Cj_oUEAIQKQ");
+                ReportEvent(GPGSIds.event_level_4);
                 break;
 
             case 5:
-                ReportEvent("CgkIsL2Cj_oUEAIQKg");
+                ReportEvent(GPGSIds.event_level_5);
                 break;
 
             case 6:
-                ReportEvent("CgkIsL2Cj_oUEAIQKw");
+                ReportEvent(GPGSIds.event_level_6);
                 break;
 
             case 7:
-                ReportEvent("CgkIsL2Cj_oUEAIQLA");
+                ReportEvent(GPGSIds.event_level_7);
                 break;
 
             case 8:
-                ReportEvent("CgkIsL2Cj_oUEAIQLQ");
+                ReportEvent(GPGSIds.event_level_8);
                 break;
 
             case 9:
-                ReportEvent("CgkIsL2Cj_oUEAIQLg");
+                ReportEvent(GPGSIds.event_level_9);
                 break;
 
             case 10:
-                ReportEvent("CgkIsL2Cj_oUEAIQLw");
+                ReportEvent(GPGSIds.event_level_10);
                 break;
 
             case 11:
-                ReportEvent("CgkIsL2Cj_oUEAIQMA");
+                ReportEvent(GPGSIds.event_level_11);
                 break;
 
             case 12:
-                ReportEvent("CgkIsL2Cj_oUEAIQMQ");
+                ReportEvent(GPGSIds.event_level_12);
                 break;
 
             case 13:
-                ReportEvent("CgkIsL2Cj_oUEAIQMg");
+                ReportEvent(GPGSIds.event_level_13);
                 break;
 
             case 14:
-                ReportEvent("CgkIsL2Cj_oUEAIQMw");
+                ReportEvent(GPGSIds.event_level_14);
                 break;
 
             case 15:
-                ReportEvent("CgkIsL2Cj_oUEAIQNA");
+                ReportEvent(GPGSIds.event_level_15);
                 break;
 
             case 16:
-                ReportEvent("CgkIsL2Cj_oUEAIQNQ");
+                ReportEvent(GPGSIds.event_level_16);
                 break;
 
             case 17:
-                ReportEvent("CgkIsL2Cj_oUEAIQNg");
+                ReportEvent(GPGSIds.event_level_17);
                 break;
 
             case 18:
-                ReportEvent("CgkIsL2Cj_oUEAIQNw");
+                ReportEvent(GPGSIds.event_level_18);
                 break;
 
             case 19:
-                ReportEvent("CgkIsL2Cj_oUEAIQOA");
+                ReportEvent(GPGSIds.event_level_19);
                 break;
 
             case 20:
-                ReportEvent("CgkIsL2Cj_oUEAIQOQ");
+                ReportEvent(GPGSIds.event_level_20);
                 break;
 
             case 21:
-                ReportEvent("CgkIsL2Cj_oUEAIQOg");
+                ReportEvent(GPGSIds.event_level_21);
                 break;
 
             case 22:
-                ReportEvent("CgkIsL2Cj_oUEAIQOw");
+                ReportEvent(GPGSIds.event_level_22);
                 break;
 
             case 23:
-                ReportEvent("CgkIsL2Cj_oUEAIQPA");
+                ReportEvent(GPGSIds.event_level_23);
                 break;
 
             case 24:
-                ReportEvent("CgkIsL2Cj_oUEAIQPQ");
+                ReportEvent(GPGSIds.event_level_24);
                 break;
 
             case 25:
-                ReportEvent("CgkIsL2Cj_oUEAIQPg");
+                ReportEvent(GPGSIds.event_level_25);
                 break;
 
             case 26:
-                ReportEvent("CgkIsL2Cj_oUEAIQPw");
+                ReportEvent(GPGSIds.event_level_26);
                 break;
 
             case 27:
-                ReportEvent("CgkIsL2Cj_oUEAIQQA");
+                ReportEvent(GPGSIds.event_level_27);
                 break;
 
             case 28:
-                ReportEvent("CgkIsL2Cj_oUEAIQQQ");
+                ReportEvent(GPGSIds.event_level_28);
                 break;
 
             case 29:
-                ReportEvent("CgkIsL2Cj_oUEAIQQg");
+                ReportEvent(GPGSIds.event_level_29);
                 break;
 
             case 30:
-                ReportEvent("CgkIsL2Cj_oUEAIQQw");
+                ReportEvent(GPGSIds.event_level_30);
                 break;
         }
     }
@@ -133,127 +134,127 @@ public class GoogleEventsReporter : MonoBehaviour
         switch (iterationNumber)
         {
             case 0:
-                ReportEvent("CgkIsL2Cj_oUEAIQYg");
+                ReportEvent(GPGSIds.event_iteration_0);
                 break;
 
             case 1:
-                ReportEvent("CgkIsL2Cj_oUEAIQRA");
+                ReportEvent(GPGSIds.event_iteration_1);
                 break;
 
             case 2:
-                ReportEvent("CgkIsL2Cj_oUEAIQRQ");
+                ReportEvent(GPGSIds.event_iteration_2);
                 break;
 
             case 3:
-                ReportEvent("CgkIsL2Cj_oUEAIQRg");
+                ReportEvent(GPGSIds.event_iteration_3);
                 break;
 
             case 4:
-                ReportEvent("CgkIsL2Cj_oUEAIQRw");
+                ReportEvent(GPGSIds.event_iteration_4);
                 break;
 
             case 5:
-                ReportEvent("CgkIsL2Cj_oUEAIQSA");
+                ReportEvent(GPGSIds.event_iteration_5);
                 break;
 
             case 6:
-                ReportEvent("CgkIsL2Cj_oUEAIQSQ");
+                ReportEvent(GPGSIds.event_iteration_6);
                 break;
 
             case 7:
-                ReportEvent("CgkIsL2Cj_oUEAIQSg");
+                ReportEvent(GPGSIds.event_iteration_7);
                 break;
 
             case 8:
-                ReportEvent("CgkIsL2Cj_oUEAIQSw");
+                ReportEvent(GPGSIds.event_iteration_8);
                 break;
 
             case 9:
-                ReportEvent("CgkIsL2Cj_oUEAIQTA");
+                ReportEvent(GPGSIds.event_iteration_9);
                 break;
 
             case 10:
-                ReportEvent("CgkIsL2Cj_oUEAIQTQ");
+                ReportEvent(GPGSIds.event_iteration_10);
                 break;
 
             case 11:
-                ReportEvent("CgkIsL2Cj_oUEAIQTg");
+                ReportEvent(GPGSIds.event_iteration_11);
                 break;
 
             case 12:
-                ReportEvent("CgkIsL2Cj_oUEAIQTw");
+                ReportEvent(GPGSIds.event_iteration_12);
                 break;
 
             case 13:
-                ReportEvent("CgkIsL2Cj_oUEAIQUA");
+                ReportEvent(GPGSIds.event_iteration_13);
                 break;
 
             case 14:
-                ReportEvent("CgkIsL2Cj_oUEAIQUQ");
+                ReportEvent(GPGSIds.event_iteration_14);
                 break;
 
             case 15:
-                ReportEvent("CgkIsL2Cj_oUEAIQUg");
+                ReportEvent(GPGSIds.event_iteration_15);
                 break;
 
             case 16:
-                ReportEvent("CgkIsL2Cj_oUEAIQUw");
+                ReportEvent(GPGSIds.event_iteration_16);
                 break;
 
             case 17:
-                ReportEvent("CgkIsL2Cj_oUEAIQVA");
+                ReportEvent(GPGSIds.event_iteration_17);
                 break;
 
             case 18:
-                ReportEvent("CgkIsL2Cj_oUEAIQVQ");
+                ReportEvent(GPGSIds.event_iteration_18);
                 break;
 
             case 19:
-                ReportEvent("CgkIsL2Cj_oUEAIQVg");
+                ReportEvent(GPGSIds.event_iteration_19);
                 break;
 
             case 20:
-                ReportEvent("CgkIsL2Cj_oUEAIQVw");
+                ReportEvent(GPGSIds.event_iteration_20);
                 break;
 
             case 21:
-                ReportEvent("CgkIsL2Cj_oUEAIQWA");
+                ReportEvent(GPGSIds.event_iteration_21);
                 break;
 
             case 22:
-                ReportEvent("CgkIsL2Cj_oUEAIQWQ");
+                ReportEvent(GPGSIds.event_iterartion_22);
                 break;
 
             case 23:
-                ReportEvent("CgkIsL2Cj_oUEAIQWg");
+                ReportEvent(GPGSIds.event_iteration_23);
                 break;
 
             case 24:
-                ReportEvent("CgkIsL2Cj_oUEAIQWw");
+                ReportEvent(GPGSIds.event_iteration_24);
                 break;
 
             case 25:
-                ReportEvent("CgkIsL2Cj_oUEAIQXA");
+                ReportEvent(GPGSIds.event_iteration_25);
                 break;
 
             case 26:
-                ReportEvent("CgkIsL2Cj_oUEAIQXQ");
+                ReportEvent(GPGSIds.event_iteration_26);
                 break;
 
             case 27:
-                ReportEvent("CgkIsL2Cj_oUEAIQXg");
+                ReportEvent(GPGSIds.event_iteration_27);
                 break;
 
             case 28:
-                ReportEvent("CgkIsL2Cj_oUEAIQXw");
+                ReportEvent(GPGSIds.event_iteration_28);
                 break;
 
             case 29:
-                ReportEvent("CgkIsL2Cj_oUEAIQYA");
+                ReportEvent(GPGSIds.event_iteration_29);
                 break;
 
             case 30:
-                ReportEvent("CgkIsL2Cj_oUEAIQYQ");
+                ReportEvent(GPGSIds.event_iteration_30);
                 break;
         }
     }

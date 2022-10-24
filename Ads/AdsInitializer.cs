@@ -4,7 +4,7 @@ using UnityEngine.Advertisements;
 public class AdsInitializer : MonoBehaviour, IUnityAdsInitializationListener
 {
     [SerializeField] string androidGameId;
-    [SerializeField] bool testMode = true;
+    [SerializeField] bool testMode;
 
     void Start()
     {

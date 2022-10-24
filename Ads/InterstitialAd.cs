@@ -6,7 +6,6 @@ using TMPro;
 public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsShowListener
 {
     [SerializeField] string adUnitId = "Interstitial_Android";
-    [SerializeField] BannerAd banner;
     TMP_Text buttonText;
 
     bool adIsLoaded = false;
@@ -59,7 +58,7 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
         if (adIsLoaded)
         {
             Debug.Log("Showing Ad: " + adUnitId);
-            banner.HideAd();
+            GameManager.Instance.HideBannerAd();
             Advertisement.Show(adUnitId, this);
         }
         else
@@ -95,7 +94,7 @@ public class InterstitialAd : MonoBehaviour, IUnityAdsLoadListener, IUnityAdsSho
 
     public void OnUnityAdsShowComplete(string adUnitId, UnityAdsShowCompletionState showCompletionState)
     {
-        banner.ShowBanner();
+        GameManager.Instance.BannerAd.ShowBanner();
         InhabilitateButton();
         LoadAd();
     }

@@ -5,6 +5,7 @@ using UnityEngine;
 public class MainMenu : MonoBehaviour
 {
     [SerializeField] GameObject mainPanel;
+    [SerializeField] GameObject continueButton;
     [SerializeField] GameObject newGamePanel;
     [SerializeField] GameObject optionsPanel;
     [SerializeField] GameObject soundPanel;
@@ -21,6 +22,11 @@ public class MainMenu : MonoBehaviour
     private void Start()
     {
         SoundManager.Instance.PlayMenuMusic();
+
+        if (GameManager.Instance.HasSavedGame())
+        {
+            continueButton.SetActive(true);
+        }
     }
 
     public void DisplayNewGamePanel()
@@ -36,6 +42,11 @@ public class MainMenu : MonoBehaviour
     public void StartNewEndlessGame()
     {
         GameManager.Instance.StartNewEndlessGame();
+    }
+
+    public void ContinueGame()
+    {
+        GameManager.Instance.ContinueGame();
     }
 
     public void ReturnToMainPanel()

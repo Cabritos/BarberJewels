@@ -5,8 +5,9 @@ using UnityEngine;
 public class FireworksSpawner : MonoBehaviour
 { 
     [SerializeField] GameObject fxPrefab;
-    Vector3 fxPosition;
-    Quaternion fxRotation;
+    Vector3 fxPosition = new Vector3();
+    Vector3 euerRotation = new Vector3();
+    Quaternion fxRotation = new Quaternion();
 
     [SerializeField] float minRandomSpawnTime;
     [SerializeField] float maxRandomSpawnTime;
@@ -52,12 +53,15 @@ public class FireworksSpawner : MonoBehaviour
 
     private void SetRandomPosition()
     {
-        fxPosition = new Vector3(UnityEngine.Random.Range(-4, 6), UnityEngine.Random.Range(-7, 10), 5);
+        fxPosition.x = UnityEngine.Random.Range(-4, 6);
+        fxPosition.y = UnityEngine.Random.Range(-7, 10);
+        fxPosition.z = 5;
     }
 
     private void SetRandomRotation()
     {
-        fxRotation = Quaternion.Euler(new Vector3(0, 0, UnityEngine.Random.Range(-maxRandomRotation, maxRandomRotation)));
+        euerRotation.z = UnityEngine.Random.Range(-maxRandomRotation, maxRandomRotation);
+        fxRotation = Quaternion.Euler(euerRotation);
     }
 
     private void ScaleToRandomScale(GameObject fireworksGameObject)

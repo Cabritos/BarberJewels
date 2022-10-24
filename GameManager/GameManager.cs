@@ -1,13 +1,15 @@
+using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameManager : SingletonMonobehaviour<GameManager>
 {
     bool isConnectedToGooglePlayServices = false;
+    public BannerAd BannerAd { get; private set; }
     AchivementsManager achivementManager;
     GoogleEventsReporter googleEventsReporter;
-    BannerAd bannerAd;
     ErrorUi errorUi;
+    SaveManager saveManager;
 
     LevelManager currentLevelManager;
     [SerializeField] LevelConfigListSO levelConfigSO;
@@ -39,35 +41,39 @@ public class GameManager : SingletonMonobehaviour<GameManager>
         errorUi = GetComponent<ErrorUi>();
         progressionManager = GetComponent<EndlessGameProgressionManager>();
         achivementManager = GetComponent<AchivementsManager>();
-        bannerAd = GetComponent<BannerAd>();
+        BannerAd = GetComponent<BannerAd>();
         googleEventsReporter = GetComponent<GoogleEventsReporter>();
+        saveManager = GetComponent<SaveManager>();
     }
-
     private void Start()
     {
-        bannerAd.LoadAndShowAd();
+        BannerAd.LoadAndShowAd();
     }
 
     public void StartNewRegularGame()
     {
-        Debug.Log("Starting new regular game");;
+        Debug.Log("Starting new regular game"); ;
+        SetupRegularGame();
+        achivementManager.ReportNewGame();
+        LoadNextLevel();
+    }
+
+    private void SetupRegularGame()
+    {
         EndlessGame = false;
         HasLost = false;
         CurrentLevel = 0;
-
+        ResetScores();
 #if UNITY_EDITOR
         if (onLevelDebug) CurrentLevel = debugLevel - 1;
 #endif
-
-        ResetScores();
-        achivementManager.ReportNewGame();
-        LoadNextLevel();
     }
 
     public void LoadNextLevel()
     {
         CurrentLevel++;
         googleEventsReporter.ReportLevel(CurrentLevel);
+        saveManager.ClearSavedData();
         LoadLevelScene();
     }
 
@@ -82,17 +88,21 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     public void StartNewEndlessGame()
     {
         Debug.Log("Starting new endless game");
+        SetupEndlessGame(); achivementManager.ReportNewGame();
+        achivementManager.ReportEndlessGame();
+        LoadLevelScene();
+    }
+
+    private void SetupEndlessGame()
+    {
         EndlessGame = true;
         HasLost = false;
+        ResetScores();
         iterationNumber = 0;
 
 #if UNITY_EDITOR
         if (onLevelDebug) iterationNumber = debugLevel - 1;
 #endif
-        ResetScores();
-        achivementManager.ReportNewGame();
-        achivementManager.ReportEndlessGame();
-        LoadLevelScene();
     }
 
     private void ResetScores()
@@ -104,7 +114,21 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     public void HideBannerAd()
     {
-        bannerAd.HideAd();
+        BannerAd.HideAd();
+    }
+
+    public bool HasSavedGame()
+    {
+        return saveManager.HasSavedGame();
+    }
+
+    public void ContinueGame()
+    {
+        SetupRegularGame();
+        var saveData = saveManager.LoadGame();
+        CurrentLevel = saveData.level;
+        TotalScore = saveData.score;
+        LoadNextLevel();
     }
 
     private void OnStartLevel()
@@ -139,31 +163,51 @@ public class GameManager : SingletonMonobehaviour<GameManager>
 
     public void WonLevel(int score, int jewelHits)
     {
-        EndLevel(score, jewelHits);
+        ProcessScores(score, jewelHits);
+        SaveGame();
+        EndLevel();
     }
 
     public void LostLevel(int score, int jewelHits)
     {
         HasLost = true;
+        saveManager.ClearSavedData();
+        ProcessScores(score, jewelHits);
         achivementManager.ReportLostGame();
-        EndLevel(score, jewelHits);
+        EndLevel();
     }
 
-    private void EndLevel(int score, int jewelHits)
+    private void EndLevel()
     {
         Debug.Log("Ending level");
         Time.timeScale = 1;
-        ProcessScores(score, jewelHits);
+        ReportProgress();
+        SoundManager.Instance.EndLevel();
+        LoadBalanceScene();
+    }
 
+    private void LoadBalanceScene()
+    {
+        SceneManager.LoadScene("Balance");
+        BannerAd.LoadAndShowAd();
+    }
+
+    private void ReportProgress()
+    {
         if (ValidateConnectivity())
         {
             ReportScore();
             ReportAchivements();
         }
+    }
 
-        SoundManager.Instance.EndLevel();
-        SceneManager.LoadScene("Balance");
-        bannerAd.LoadAndShowAd();
+    private void SaveGame()
+    {
+        if (!EndlessGame)
+        {
+            var saveData = new SaveManager.SaveData(CurrentLevel, TotalScore);
+            saveManager.SaveGame(saveData);
+        }
     }
 
     private void ProcessScores(int score, int jewelHits)
@@ -227,7 +271,7 @@ public class GameManager : SingletonMonobehaviour<GameManager>
     public void LoadMainMenu()
     {
         SceneManager.LoadScene("MainMenu");
-        bannerAd.LoadAndShowAd();
+        BannerAd.LoadAndShowAd();
     }
 
     public LevelConfigSO GetCurrentConfig()

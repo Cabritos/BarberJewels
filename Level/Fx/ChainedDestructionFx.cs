@@ -120,4 +120,9 @@ public class ChainedDestructionFx : MonoBehaviour
         if (levelManager != null) levelManager.ResetingPositions -= ResetPosition;
         Destroy(gameObject);
     }
+
+    private void OnDestroy()
+    {
+        CancelInvoke();
+    }
 }
